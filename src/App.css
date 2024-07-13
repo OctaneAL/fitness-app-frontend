@@ -1,5 +1,40 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body { padding-bottom: 200px; margin-bottom: 200px;}
+
 .App {
+  display: flex;
+  flex-direction: column;
   text-align: center;
+  min-height: 100vh;
+}
+
+
+.main-content {
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  overflow: auto; /* Додає прокручування, якщо вміст перевищує висоту контейнера */
+  padding: 20px;  /* Відступи всередині контейнера */
+  box-sizing: border-box; /* Враховує padding і border в загальну ширину та висоту */
+}
+
+.footer {
+  background-color: #f8f9fa;
+  padding: 1rem 0;
+  height: 200px;
+}
+
+.footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
 }
 
 .App-logo {

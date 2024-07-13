@@ -4,8 +4,12 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Protected from './pages/Protected';
+import Calendar from './pages/Calendar';
 import Header from './components/Header';
 import Footer from './components/Footer';
+
+
+import './App.css'; // Додайте цей імпорт
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -18,10 +22,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/calendar" element={<Calendar />} />
           <Route path="/protected" element={<Protected />} />
         </Routes>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 }
