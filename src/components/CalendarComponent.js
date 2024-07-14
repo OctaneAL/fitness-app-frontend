@@ -9,7 +9,7 @@ import bgImage from '../assets/images/bg.jpg';
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newEventName, setNewEventName] = useState('');
+  const [newEvent, setNewEvent] = useState({ name: '', exercises: [{ name: '', sets: '' }] });
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
@@ -221,17 +221,19 @@ const CalendarComponent = () => {
   }, []);
 
   const handleAddEvent = () => {
-    const newEvent = {
+    const newEventWithDate = {
+      ...newEvent,
       date: selectedDate,
-      eventName: newEventName,
     };
-    setEvents([...events, newEvent]);
-    setNewEventName('');
+    setEvents([...events, newEventWithDate]);
+    setNewEvent({ name: '', exercises: [{ name: '', sets: '' }] });
     setShowModal(false);
   };
 
-  const handleInputChange = (e) => {
-    setNewEventName(e.target.value);
+  const handleInputChange = (e, index, type) => {
+    const updatedExercises = [...newEvent.exercises];
+    updatedExercises[index][type] = e.target.value;
+    setNewEvent({ ...newEvent, exercises: updatedExercises });
   };
 
   const filteredEvents = events.filter(event => event.date === selectedDate);
@@ -350,7 +352,14 @@ const CalendarComponent = () => {
                 <ul className="list-group">
                   {filteredEvents.map((event, index) => (
                     <li key={index} className="list-group-item">
-                      {event.date}: {event.eventName}
+                      <strong>{event.name}</strong>
+                      <ul>
+                        {event.exercises.map((exercise, idx) => (
+                          <li key={idx}>
+                            {exercise.name}: {exercise.sets} підходів
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   ))}
                 </ul>
@@ -371,13 +380,57 @@ const CalendarComponent = () => {
               <Form.Control
                 type="text"
                 placeholder="Введіть назву тренування"
-                value={newEventName}
-                onChange={handleInputChange}
+                value={newEvent.name}
+                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
               />
             </Form.Group>
+            {newEvent.exercises.map((exercise, index) => (
+              <div key={index} className="exercise-group">
+                <Form.Group controlId={`exerciseName-${index}`}>
+                  <Form.Label>Назва вправи</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Введіть назву вправи"
+                    value={exercise.name}
+                    onChange={(e) => handleInputChange(e, index, 'name')}
+                  />
+                </Form.Group>
+                <Form.Group controlId={`exerciseSets-${index}`}>
+                  <Form.Label>Кількість підходів</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Введіть кількість підходів"
+                    value={exercise.sets}
+                    onChange={(e) => handleInputChange(e, index, 'sets')}
+                  />
+                </Form.Group>
+                <div className="d-flex justify-content-between w-100">
+                  <Button
+                    variant="danger"
+                    style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+                    onClick={() => {
+                      const updatedExercises = newEvent.exercises.filter((_, i) => i !== index);
+                      setNewEvent({ ...newEvent, exercises: updatedExercises });
+                    }}
+                  >
+                    Видалити вправу
+                  </Button>
+                </div>
+              </div>
+            ))}
+            
           </Form>
         </Modal.Body>
         <Modal.Footer>
+          <Button
+            variant="secondary"
+            style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+            onClick={() =>
+              setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: '' }] })
+            }
+          >
+            Додати вправу
+          </Button>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Закрити
           </Button>
