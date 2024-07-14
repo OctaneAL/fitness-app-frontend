@@ -1,12 +1,17 @@
-// src/components/CalendarComponent.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import { Modal, Button, Form } from 'react-bootstrap';
 import '../pages/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
 
 const CalendarComponent = () => {
+  const [events, setEvents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newEventName, setNewEventName] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
+
   useEffect(() => {
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
@@ -30,12 +35,12 @@ const CalendarComponent = () => {
     };
 
     const initCalendar = () => {
-      const Calendar = function(selector, options) {
+      const Calendar = function (selector, options) {
         this.options = options;
         this.draw();
       };
 
-      Calendar.prototype.draw = function() {
+      Calendar.prototype.draw = function () {
         this.getCookie('selected_day');
         this.getOptions();
         this.drawDays();
@@ -43,7 +48,7 @@ const CalendarComponent = () => {
         const reset = document.getElementById('reset');
         const pre = document.getElementsByClassName('pre-button');
         const next = document.getElementsByClassName('next-button');
-        
+
         pre[0].addEventListener('click', () => that.preMonth());
         next[0].addEventListener('click', () => that.nextMonth());
         reset.addEventListener('click', () => that.reset());
@@ -51,13 +56,13 @@ const CalendarComponent = () => {
         const days = document.getElementsByTagName('td');
         let daysLen = days.length;
         while (daysLen--) {
-          days[daysLen].addEventListener('click', function() {
+          days[daysLen].addEventListener('click', function () {
             that.clickDay(this);
           });
         }
       };
 
-      Calendar.prototype.drawHeader = function(e) {
+      Calendar.prototype.drawHeader = function (e) {
         const headDay = document.getElementsByClassName('head-day');
         const headMonth = document.getElementsByClassName('head-month');
 
@@ -65,7 +70,7 @@ const CalendarComponent = () => {
         headMonth[0].innerHTML = `${monthTag[month]} - ${year}`;
       };
 
-      Calendar.prototype.drawDays = function() {
+      Calendar.prototype.drawDays = function () {
         const startDay = new Date(year, month, 1).getDay();
         const nDays = new Date(year, month + 1, 0).getDate();
         let n = startDay;
@@ -106,7 +111,7 @@ const CalendarComponent = () => {
         }
       };
 
-      Calendar.prototype.clickDay = function(o) {
+      Calendar.prototype.clickDay = function (o) {
         const selected = document.getElementsByClassName('selected');
         const len = selected.length;
         if (len !== 0) {
@@ -116,9 +121,12 @@ const CalendarComponent = () => {
         selectedDay = new Date(year, month, o.innerHTML);
         this.drawHeader(o.innerHTML);
         this.setCookie('selected_day', 1);
+
+        // Set selected date
+        setSelectedDate(selectedDay.toISOString().split('T')[0]);
       };
 
-      Calendar.prototype.preMonth = function() {
+      Calendar.prototype.preMonth = function () {
         if (month < 1) {
           month = 11;
           year -= 1;
@@ -129,7 +137,7 @@ const CalendarComponent = () => {
         this.drawDays();
       };
 
-      Calendar.prototype.nextMonth = function() {
+      Calendar.prototype.nextMonth = function () {
         if (month >= 11) {
           month = 0;
           year += 1;
@@ -140,7 +148,7 @@ const CalendarComponent = () => {
         this.drawDays();
       };
 
-      Calendar.prototype.getOptions = function() {
+      Calendar.prototype.getOptions = function () {
         if (this.options) {
           const sets = this.options.split('-');
           setDate = new Date(sets[0], sets[1] - 1, sets[2]);
@@ -150,7 +158,7 @@ const CalendarComponent = () => {
         }
       };
 
-      Calendar.prototype.reset = function() {
+      Calendar.prototype.reset = function () {
         month = today.getMonth();
         year = today.getFullYear();
         day = today.getDate();
@@ -158,7 +166,7 @@ const CalendarComponent = () => {
         this.drawDays();
       };
 
-      Calendar.prototype.setCookie = function(name, expiredays) {
+      Calendar.prototype.setCookie = function (name, expiredays) {
         let expires = '';
         if (expiredays) {
           const date = new Date();
@@ -168,7 +176,7 @@ const CalendarComponent = () => {
         document.cookie = name + '=' + selectedDay + expires + '; path=/';
       };
 
-      Calendar.prototype.getCookie = function(name) {
+      Calendar.prototype.getCookie = function (name) {
         if (document.cookie.length) {
           const arrCookie = document.cookie.split(';');
           const nameEQ = name + '=';
@@ -212,16 +220,27 @@ const CalendarComponent = () => {
     loadJQueryAndBootstrap();
   }, []);
 
+  const handleAddEvent = () => {
+    const newEvent = {
+      date: selectedDate,
+      eventName: newEventName,
+    };
+    setEvents([...events, newEvent]);
+    setNewEventName('');
+    setShowModal(false);
+  };
+
+  const handleInputChange = (e) => {
+    setNewEventName(e.target.value);
+  };
+
+  const filteredEvents = events.filter(event => event.date === selectedDate);
+
   return (
     <section className="ftco-section">
       <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center mb-5">
-            <h2 className="heading-section">Calendar #07</h2>
-          </div>
-        </div>
         <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-8">
             <div className="elegant-calencar d-md-flex">
               <div className="wrap-header d-flex align-items-center img" style={{ backgroundImage: `url(${bgImage})` }}>
                 <p id="reset">Today</p>
@@ -310,11 +329,63 @@ const CalendarComponent = () => {
                     </tr>
                   </tbody>
                 </table>
+                <div className="d-flex justify-content-end mt-3">
+                  <Button variant="primary" onClick={() => setShowModal(true)}>
+                    Додати тренування
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="training-list elegant-calencar">
+              <div className="d-flex align-items-center" style={{ backgroundColor: '#2C3E50', color: '#fff' }}>
+                <div className="p-0">
+                  <div className="head-info">
+                    <h5 className="training-list-title">Список тренувань</h5>
+                  </div>
+                </div>
+              </div>
+              <div className="training-list-wrap" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
+                <ul className="list-group">
+                  {filteredEvents.map((event, index) => (
+                    <li key={index} className="list-group-item">
+                      {event.date}: {event.eventName}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Додати тренування</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="eventName">
+              <Form.Label>Назва тренування</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Введіть назву тренування"
+                value={newEventName}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Закрити
+          </Button>
+          <Button variant="primary" onClick={handleAddEvent}>
+            Зберегти
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };
