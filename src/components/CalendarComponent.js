@@ -9,8 +9,12 @@ import bgImage from '../assets/images/bg.jpg';
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newEvent, setNewEvent] = useState({ name: '', exercises: [{ name: '', sets: '' }] });
+  const [newEvent, setNewEvent] = useState({
+    name: '',
+    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: 0 }] }],
+  });
   const [selectedDate, setSelectedDate] = useState(null);
+  const [validated, setValidated] = useState(false);
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -220,30 +224,62 @@ const CalendarComponent = () => {
     loadJQueryAndBootstrap();
   }, []);
 
-  const handleAddEvent = () => {
-    const newEventWithDate = {
-      ...newEvent,
-      date: selectedDate,
-    };
-    setEvents([...events, newEventWithDate]);
-    setNewEvent({ name: '', exercises: [{ name: '', sets: '' }] });
-    setShowModal(false);
+  const handleAddEvent = (event) => {
+    const form = event.currentTarget;
+    event.preventDefault();
+    console.log(form.checkValidity());
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      setEvents([...events, { ...newEvent, date: selectedDate }]);
+      setShowModal(false);
+      setNewEvent({ name: '', exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] });
+    }
+    setValidated(true);
   };
 
-  const handleInputChange = (e, index, type) => {
+  const handleInputChange = (e, exerciseIndex, field, setIndex) => {
+    const { value } = e.target;
     const updatedExercises = [...newEvent.exercises];
-    updatedExercises[index][type] = e.target.value;
+    if (setIndex !== undefined) {
+      updatedExercises[exerciseIndex].details[setIndex][field] = value;
+    } else {
+      updatedExercises[exerciseIndex][field] = value;
+    }
     setNewEvent({ ...newEvent, exercises: updatedExercises });
   };
 
-  const filteredEvents = events.filter(event => event.date === selectedDate);
+  const handleSetsChange = (e, exerciseIndex) => {
+    const { value } = e.target;
+    let sets = parseInt(value, 10);
+  
+    if (isNaN(sets) || value === '') {
+      sets = 0;
+    }
+    if (sets > 20) {
+      sets = 20;
+    }
+  
+    const updatedExercises = [...newEvent.exercises];
+    updatedExercises[exerciseIndex].sets = sets;
+  
+    updatedExercises[exerciseIndex].details = Array(sets)
+      .fill(null)
+      .map((_, idx) => updatedExercises[exerciseIndex].details[idx] || { repeats: 1, weight: '' });
+    setNewEvent({ ...newEvent, exercises: updatedExercises });
+  };
+  
+
+  const filteredEvents = selectedDate ? events.filter((event) => event.date === selectedDate) : events;
+
 
   return (
-    <section className="ftco-section">
-      <div className="container">
+    <section>
+      <div className="container mt-5">
         <div className="row">
           <div className="col-md-8">
-            <div className="elegant-calencar d-md-flex">
+            <div className="calendar elegant-calencar d-md-flex">
               <div className="wrap-header d-flex align-items-center img" style={{ backgroundImage: `url(${bgImage})` }}>
                 <p id="reset">Today</p>
                 <div id="header" className="p-0">
@@ -357,6 +393,13 @@ const CalendarComponent = () => {
                         {event.exercises.map((exercise, idx) => (
                           <li key={idx}>
                             {exercise.name}: {exercise.sets} підходів
+                            <ul>
+                              {exercise.details.map((detail, detailIdx) => (
+                                <li key={detailIdx}>
+                                  Повтори: {detail.repeats}, Вага: {detail.weight} кг
+                                </li>
+                              ))}
+                            </ul>
                           </li>
                         ))}
                       </ul>
@@ -373,8 +416,8 @@ const CalendarComponent = () => {
         <Modal.Header closeButton>
           <Modal.Title>Додати тренування</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <Form>
+        <Form noValidate validated={validated} onSubmit={handleAddEvent}>
+          <Modal.Body>
             <Form.Group controlId="eventName">
               <Form.Label>Назва тренування</Form.Label>
               <Form.Control
@@ -382,34 +425,70 @@ const CalendarComponent = () => {
                 placeholder="Введіть назву тренування"
                 value={newEvent.name}
                 onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+                required
               />
+              <Form.Control.Feedback type="invalid">Будь ласка, введіть назву тренування.</Form.Control.Feedback>
             </Form.Group>
-            {newEvent.exercises.map((exercise, index) => (
-              <div key={index} className="exercise-group">
-                <Form.Group controlId={`exerciseName-${index}`}>
+            {newEvent.exercises.map((exercise, exerciseIndex) => (
+              <div key={exerciseIndex} className="exercise-group" style={{paddingBottom: '0px', marginBottom: '0px'}}>
+                <Form.Group controlId={`exerciseName-${exerciseIndex}`}>
                   <Form.Label>Назва вправи</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Введіть назву вправи"
                     value={exercise.name}
-                    onChange={(e) => handleInputChange(e, index, 'name')}
+                    onChange={(e) => handleInputChange(e, exerciseIndex, 'name')}
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Будь ласка, введіть назву вправи.</Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group controlId={`exerciseSets-${index}`}>
+                <Form.Group controlId={`exerciseSets-${exerciseIndex}`}>
                   <Form.Label>Кількість підходів</Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Введіть кількість підходів"
                     value={exercise.sets}
-                    onChange={(e) => handleInputChange(e, index, 'sets')}
+                    onChange={(e) => handleSetsChange(e, exerciseIndex)}
+                    min="0"
+                    max="20"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Кількість підходів повинна бути більше 0.</Form.Control.Feedback>
                 </Form.Group>
+                {exercise.details.map((detail, setIndex) => (
+                  <div key={setIndex} className="set-details">
+                    <Form.Group controlId={`exerciseRepeats-${exerciseIndex}-${setIndex}`}>
+                      <Form.Label>Кількість повторів (Підхід {setIndex + 1})</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Введіть кількість повторів"
+                        value={detail.repeats}
+                        onChange={(e) => handleInputChange(e, exerciseIndex, 'repeats', setIndex)}
+                        min="1"
+                        required
+                      />
+                      <Form.Control.Feedback type="invalid">Кількість повторів повинна бути більше 0.</Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group controlId={`exerciseWeight-${exerciseIndex}-${setIndex}`}>
+                      <Form.Label>Вага (кг) (Підхід {setIndex + 1})</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Введіть вагу"
+                        value={detail.weight}
+                        onChange={(e) => handleInputChange(e, exerciseIndex, 'weight', setIndex)}
+                        min="0"
+                        required
+                      />
+                      <Form.Control.Feedback type="invalid">Будь ласка, введіть вагу.</Form.Control.Feedback>
+                    </Form.Group>
+                  </div>
+                ))}
                 <div className="d-flex justify-content-between w-100">
                   <Button
                     variant="danger"
                     style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
                     onClick={() => {
-                      const updatedExercises = newEvent.exercises.filter((_, i) => i !== index);
+                      const updatedExercises = newEvent.exercises.filter((_, i) => i !== exerciseIndex);
                       setNewEvent({ ...newEvent, exercises: updatedExercises });
                     }}
                   >
@@ -418,26 +497,26 @@ const CalendarComponent = () => {
                 </div>
               </div>
             ))}
-            
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
-            onClick={() =>
-              setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: '' }] })
-            }
-          >
-            Додати вправу
-          </Button>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Закрити
-          </Button>
-          <Button variant="primary" onClick={handleAddEvent}>
-            Зберегти
-          </Button>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+              onClick={() =>
+                setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] })
+              }
+            >
+              Додати вправу
+            </Button>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Закрити
+            </Button>
+            <Button variant="primary" type="submit">
+              Зберегти
+            </Button>
+          </Modal.Footer>
+        </Form>
+        
       </Modal>
     </section>
   );
