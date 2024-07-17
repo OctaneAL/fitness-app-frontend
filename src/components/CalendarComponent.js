@@ -4,19 +4,21 @@ import 'font-awesome/css/font-awesome.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import '../pages/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
+import { v4 as uuidv4 } from 'uuid';
 
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const initialEventState = {
+    id: uuidv4(),
     name: '',
+    date: '',
     exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }]
   };
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [selectedDate, setSelectedDate] = useState(null);
   const [validated, setValidated] = useState(false);
-  const [editEvent, setEditEvent] = useState(null);
-  
+  const [editEventId, setEditEventId] = useState(null);
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -131,11 +133,12 @@ const CalendarComponent = () => {
         if (len !== 0) {
           selected[0].className = '';
         }
+
+        let x = parseInt(o.innerHTML, 10) + 1; // Adding 1 cuz somehow it decreases by 1 in toISOSString func
         o.className = 'selected';
-        selectedDay = new Date(year, month, o.innerHTML);
+        selectedDay = new Date(year, month, x);
         this.drawHeader(o.innerHTML);
         this.setCookie('selected_day', 1);
-
         // Set selected date
         setSelectedDate(selectedDay.toISOString().split('T')[0]);
       };
@@ -235,38 +238,33 @@ const CalendarComponent = () => {
     loadJQueryAndBootstrap();
   }, []);
 
-  const handleDeleteEvent = (index) => {
-    const updatedEvents = events.filter((_, i) => i !== index);
+  const handleDeleteEvent = (id) => {
+    const updatedEvents = events.filter((event) => event.id !== id);
+    // const updatedEvents = events.filter((_, i) => i !== index);
     setEvents(updatedEvents);
   };
 
   const handleShowModal = () => {
-    console.log("ADD");
-    setEditEvent(null);
-    console.log(editEvent);
+    setEditEventId(null);
     setShowModal(true);
   };
 
-  const handleEditEvent = (eventIndex) => {
-    console.log("EDIT"); 
-    console.log(eventIndex);
-    const eventToEdit = filteredEvents[eventIndex];
+  const handleEditEvent = (eventId) => {
+    // const eventToEdit = filteredEvents[eventIndex];
+    const eventToEdit = events.find((event) => event.id === eventId);
     console.log(eventToEdit);
-    console.log(filteredEvents);
-    setEditEvent(eventIndex);
-    setNewEvent(eventToEdit);
+    setNewEvent(eventToEdit || initialEventState);
+    setEditEventId(eventId);
     setShowModal(true);
-    console.log(editEvent);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditEvent(null);
+    setEditEventId(null);
     setNewEvent(initialEventState);
   };
   
   const handleAddEvent = (event) => {
-    console.log("editEvent", editEvent);
     const form = event.currentTarget;
     event.preventDefault();
 
@@ -275,16 +273,18 @@ const CalendarComponent = () => {
       event.stopPropagation();
     } else {
       let updatedEvents;
-      if (editEvent !== null) {
-        updatedEvents = [...events];
-        updatedEvents[editEvent] = { ...newEvent, date: selectedDate };
+      if (editEventId !== null) {
+        // updatedEvents = [...events];
+        // updatedEvents[editEvent] = { ...newEvent, date: selectedDate };
+        updatedEvents = events.map((evt) => (evt.id === editEventId ? { ...newEvent, date: selectedDate } : evt));
       } else {
-        updatedEvents = [...events, { ...newEvent, date: selectedDate }];
+        // updatedEvents = [...events, { ...newEvent, date: selectedDate }];
+        updatedEvents = [...events, { ...newEvent, id: uuidv4(), date: selectedDate }];
       }
       setEvents(updatedEvents);
       setShowModal(false);
-      setNewEvent({ name: '', exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] });
-      setEditEvent(null);
+      setNewEvent(initialEventState);
+      setEditEventId(null);
     }
     setValidated(true);
   };
@@ -323,7 +323,6 @@ const CalendarComponent = () => {
   
 
   const filteredEvents = selectedDate ? events.filter((event) => event.date == selectedDate) : events;
-
 
   return (
     <section>
@@ -455,8 +454,8 @@ const CalendarComponent = () => {
                         ))}
                       </ul>
                       <div className="d-flex justify-content-between">
-                        <Button variant="secondary" onClick={() => handleEditEvent(index)}>Редагувати</Button>
-                        <Button variant="danger" onClick={() => handleDeleteEvent(index)}>Видалити</Button>
+                        <Button variant="secondary" onClick={() => handleEditEvent(event.id)}>Редагувати</Button>
+                        <Button variant="danger" onClick={() => handleDeleteEvent(event.id)}>Видалити</Button>
                       </div>
                     </li>
                   ))}
@@ -469,7 +468,7 @@ const CalendarComponent = () => {
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{editEvent ? "Редагувати тренування" : "Додати тренування"}</Modal.Title>
+          <Modal.Title>{editEventId ? "Редагувати тренування" : "Додати тренування"}</Modal.Title>
         </Modal.Header>
         <Form noValidate validated={validated} onSubmit={handleAddEvent}>
           <Modal.Body>
