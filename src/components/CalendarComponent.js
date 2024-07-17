@@ -322,7 +322,7 @@ const CalendarComponent = () => {
   };
   
 
-  const filteredEvents = selectedDate ? events.filter((event) => event.date === selectedDate) : events;
+  const filteredEvents = selectedDate ? events.filter((event) => event.date == selectedDate) : events;
 
 
   return (
