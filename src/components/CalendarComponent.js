@@ -9,12 +9,15 @@ import bgImage from '../assets/images/bg.jpg';
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newEvent, setNewEvent] = useState({
+  const initialEventState = {
     name: '',
-    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: 0 }] }],
-  });
+    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }]
+  };
+  const [newEvent, setNewEvent] = useState(initialEventState);
   const [selectedDate, setSelectedDate] = useState(null);
   const [validated, setValidated] = useState(false);
+  const [editEvent, setEditEvent] = useState(null);
+  
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -224,20 +227,47 @@ const CalendarComponent = () => {
     loadJQueryAndBootstrap();
   }, []);
 
+  const handleDeleteEvent = (index) => {
+    const updatedEvents = events.filter((_, i) => i !== index);
+    setEvents(updatedEvents);
+  };
+
+  const handleEditEvent = (eventIndex) => {
+    const eventToEdit = filteredEvents[eventIndex];
+    setNewEvent(eventToEdit);
+    setEditEvent(eventIndex);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditEvent(null);
+    setNewEvent(initialEventState);
+  };
+  
   const handleAddEvent = (event) => {
     const form = event.currentTarget;
     event.preventDefault();
-    console.log(form.checkValidity());
+
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     } else {
-      setEvents([...events, { ...newEvent, date: selectedDate }]);
+      let updatedEvents;
+      if (editEvent !== null) {
+        updatedEvents = [...events];
+        updatedEvents[editEvent] = { ...newEvent, date: selectedDate };
+      } else {
+        updatedEvents = [...events, { ...newEvent, date: selectedDate }];
+      }
+      setEvents(updatedEvents);
       setShowModal(false);
       setNewEvent({ name: '', exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] });
+      setEditEvent(null);
     }
     setValidated(true);
   };
+
 
   const handleInputChange = (e, exerciseIndex, field, setIndex) => {
     const { value } = e.target;
@@ -403,6 +433,10 @@ const CalendarComponent = () => {
                           </li>
                         ))}
                       </ul>
+                      <div className="d-flex justify-content-between">
+                        <Button variant="secondary" onClick={() => handleEditEvent(index)}>Редагувати</Button>
+                        <Button variant="danger" onClick={() => handleDeleteEvent(index)}>Видалити</Button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -412,112 +446,112 @@ const CalendarComponent = () => {
         </div>
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Додати тренування</Modal.Title>
-        </Modal.Header>
-        <Form noValidate validated={validated} onSubmit={handleAddEvent}>
-          <Modal.Body>
-            <Form.Group controlId="eventName">
-              <Form.Label>Назва тренування</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Введіть назву тренування"
-                value={newEvent.name}
-                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
-                required
-              />
-              <Form.Control.Feedback type="invalid">Будь ласка, введіть назву тренування.</Form.Control.Feedback>
-            </Form.Group>
-            {newEvent.exercises.map((exercise, exerciseIndex) => (
-              <div key={exerciseIndex} className="exercise-group" style={{paddingBottom: '0px', marginBottom: '0px'}}>
-                <Form.Group controlId={`exerciseName-${exerciseIndex}`}>
-                  <Form.Label>Назва вправи</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Введіть назву вправи"
-                    value={exercise.name}
-                    onChange={(e) => handleInputChange(e, exerciseIndex, 'name')}
-                    required
-                  />
-                  <Form.Control.Feedback type="invalid">Будь ласка, введіть назву вправи.</Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId={`exerciseSets-${exerciseIndex}`}>
-                  <Form.Label>Кількість підходів</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Введіть кількість підходів"
-                    value={exercise.sets}
-                    onChange={(e) => handleSetsChange(e, exerciseIndex)}
-                    min="0"
-                    max="20"
-                    required
-                  />
-                  <Form.Control.Feedback type="invalid">Кількість підходів повинна бути більше 0.</Form.Control.Feedback>
-                </Form.Group>
-                {exercise.details.map((detail, setIndex) => (
-                  <div key={setIndex} className="set-details">
-                    <Form.Group controlId={`exerciseRepeats-${exerciseIndex}-${setIndex}`}>
-                      <Form.Label>Кількість повторів (Підхід {setIndex + 1})</Form.Label>
-                      <Form.Control
-                        type="number"
-                        placeholder="Введіть кількість повторів"
-                        value={detail.repeats}
-                        onChange={(e) => handleInputChange(e, exerciseIndex, 'repeats', setIndex)}
-                        min="1"
-                        required
-                      />
-                      <Form.Control.Feedback type="invalid">Кількість повторів повинна бути більше 0.</Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group controlId={`exerciseWeight-${exerciseIndex}-${setIndex}`}>
-                      <Form.Label>Вага (кг) (Підхід {setIndex + 1})</Form.Label>
-                      <Form.Control
-                        type="number"
-                        placeholder="Введіть вагу"
-                        value={detail.weight}
-                        onChange={(e) => handleInputChange(e, exerciseIndex, 'weight', setIndex)}
-                        min="0"
-                        required
-                      />
-                      <Form.Control.Feedback type="invalid">Будь ласка, введіть вагу.</Form.Control.Feedback>
-                    </Form.Group>
-                  </div>
-                ))}
-                <div className="d-flex justify-content-between w-100">
-                  <Button
-                    variant="danger"
-                    style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
-                    onClick={() => {
-                      const updatedExercises = newEvent.exercises.filter((_, i) => i !== exerciseIndex);
-                      setNewEvent({ ...newEvent, exercises: updatedExercises });
-                    }}
-                  >
-                    Видалити вправу
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </Modal.Body>
-          <Modal.Footer>
+      <Modal show={showModal} onHide={handleCloseModal}>
+  <Modal.Header closeButton>
+    <Modal.Title>{editEvent ? "Редагувати тренування" : "Додати тренування"}</Modal.Title>
+  </Modal.Header>
+  <Form noValidate validated={validated} onSubmit={handleAddEvent}>
+    <Modal.Body>
+      <Form.Group controlId="eventName">
+        <Form.Label>Назва тренування</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="Введіть назву тренування"
+          value={newEvent.name}
+          onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+          required
+        />
+        <Form.Control.Feedback type="invalid">Будь ласка, введіть назву тренування.</Form.Control.Feedback>
+      </Form.Group>
+      {newEvent.exercises.map((exercise, exerciseIndex) => (
+        <div key={exerciseIndex} className="exercise-group">
+          <Form.Group controlId={`exerciseName-${exerciseIndex}`}>
+            <Form.Label>Назва вправи</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Введіть назву вправи"
+              value={exercise.name}
+              onChange={(e) => handleInputChange(e, exerciseIndex, 'name')}
+              required
+            />
+            <Form.Control.Feedback type="invalid">Будь ласка, введіть назву вправи.</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group controlId={`exerciseSets-${exerciseIndex}`}>
+            <Form.Label>Кількість підходів</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Введіть кількість підходів"
+              value={exercise.sets}
+              onChange={(e) => handleSetsChange(e, exerciseIndex)}
+              min="0"
+              max="20"
+              required
+            />
+            <Form.Control.Feedback type="invalid">Кількість підходів повинна бути більше 0.</Form.Control.Feedback>
+          </Form.Group>
+          {exercise.details.map((detail, setIndex) => (
+            <div key={setIndex} className="set-details">
+              <Form.Group controlId={`exerciseRepeats-${exerciseIndex}-${setIndex}`}>
+                <Form.Label>Кількість повторів (Підхід {setIndex + 1})</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Введіть кількість повторів"
+                  value={detail.repeats}
+                  onChange={(e) => handleInputChange(e, exerciseIndex, 'repeats', setIndex)}
+                  min="1"
+                  required
+                />
+                <Form.Control.Feedback type="invalid">Кількість повторів повинна бути більше 0.</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId={`exerciseWeight-${exerciseIndex}-${setIndex}`}>
+                <Form.Label>Вага (кг) (Підхід {setIndex + 1})</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Введіть вагу"
+                  value={detail.weight}
+                  onChange={(e) => handleInputChange(e, exerciseIndex, 'weight', setIndex)}
+                  min="0"
+                  required
+                />
+                <Form.Control.Feedback type="invalid">Будь ласка, введіть вагу.</Form.Control.Feedback>
+              </Form.Group>
+            </div>
+          ))}
+          <div className="d-flex justify-content-between w-100">
             <Button
-              variant="secondary"
+              variant="danger"
               style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
-              onClick={() =>
-                setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] })
-              }
+              onClick={() => {
+                const updatedExercises = newEvent.exercises.filter((_, i) => i !== exerciseIndex);
+                setNewEvent({ ...newEvent, exercises: updatedExercises });
+              }}
             >
-              Додати вправу
+              Видалити вправу
             </Button>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Закрити
-            </Button>
-            <Button variant="primary" type="submit">
-              Зберегти
-            </Button>
-          </Modal.Footer>
-        </Form>
-        
-      </Modal>
+          </div>
+        </div>
+      ))}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button
+        variant="secondary"
+        style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+        onClick={() =>
+          setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] })
+        }
+      >
+        Додати вправу
+      </Button>
+      <Button variant="secondary" onClick={handleCloseModal}>
+        Закрити
+      </Button>
+      <Button variant="primary" type="submit">
+        Зберегти
+      </Button>
+    </Modal.Footer>
+  </Form>
+</Modal>
+
     </section>
   );
 };
