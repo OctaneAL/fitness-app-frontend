@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
@@ -9,12 +8,15 @@ import bgImage from '../assets/images/bg.jpg';
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newEvent, setNewEvent] = useState({
+  const initialEventState = {
     name: '',
-    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: 0 }] }],
-  });
+    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }]
+  };
+  const [newEvent, setNewEvent] = useState(initialEventState);
   const [selectedDate, setSelectedDate] = useState(null);
   const [validated, setValidated] = useState(false);
+  const [editEvent, setEditEvent] = useState(null);
+  
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -49,13 +51,13 @@ const CalendarComponent = () => {
         this.getOptions();
         this.drawDays();
         const that = this;
-        const reset = document.getElementById('reset');
+        // const reset = document.getElementById('reset');
         const pre = document.getElementsByClassName('pre-button');
         const next = document.getElementsByClassName('next-button');
 
         pre[0].addEventListener('click', () => that.preMonth());
         next[0].addEventListener('click', () => that.nextMonth());
-        reset.addEventListener('click', () => that.reset());
+        // reset.addEventListener('click', () => that.reset());
 
         const days = document.getElementsByTagName('td');
         let daysLen = days.length;
@@ -63,6 +65,14 @@ const CalendarComponent = () => {
           days[daysLen].addEventListener('click', function () {
             that.clickDay(this);
           });
+        }
+
+         // Automatically select today's date on initial load
+        const today = new Date();
+        const todayCell = Array.from(days).find(day => day.innerHTML == today.getDate() && day.id !== 'disabled');
+        console.log(todayCell);
+        if (todayCell) {
+          this.clickDay(todayCell);
         }
       };
 
@@ -217,27 +227,68 @@ const CalendarComponent = () => {
       const days = document.getElementsByTagName('td');
       let selectedDay;
       let setDate;
-      let daysLen = days.length;
-      const calendar = new Calendar();
+      // let daysLen = days.length;
+      // const calendar = new Calendar();
+      new Calendar();
     };
 
     loadJQueryAndBootstrap();
   }, []);
 
+  const handleDeleteEvent = (index) => {
+    const updatedEvents = events.filter((_, i) => i !== index);
+    setEvents(updatedEvents);
+  };
+
+  const handleShowModal = () => {
+    console.log("ADD");
+    setEditEvent(null);
+    console.log(editEvent);
+    setShowModal(true);
+  };
+
+  const handleEditEvent = (eventIndex) => {
+    console.log("EDIT"); 
+    console.log(eventIndex);
+    const eventToEdit = filteredEvents[eventIndex];
+    console.log(eventToEdit);
+    console.log(filteredEvents);
+    setEditEvent(eventIndex);
+    setNewEvent(eventToEdit);
+    setShowModal(true);
+    console.log(editEvent);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditEvent(null);
+    setNewEvent(initialEventState);
+  };
+  
   const handleAddEvent = (event) => {
+    console.log("editEvent", editEvent);
     const form = event.currentTarget;
     event.preventDefault();
-    console.log(form.checkValidity());
+
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     } else {
-      setEvents([...events, { ...newEvent, date: selectedDate }]);
+      let updatedEvents;
+      if (editEvent !== null) {
+        updatedEvents = [...events];
+        updatedEvents[editEvent] = { ...newEvent, date: selectedDate };
+      } else {
+        updatedEvents = [...events, { ...newEvent, date: selectedDate }];
+      }
+      setEvents(updatedEvents);
       setShowModal(false);
       setNewEvent({ name: '', exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] });
+      setEditEvent(null);
     }
     setValidated(true);
   };
+
 
   const handleInputChange = (e, exerciseIndex, field, setIndex) => {
     const { value } = e.target;
@@ -281,7 +332,7 @@ const CalendarComponent = () => {
           <div className="col-md-8">
             <div className="calendar elegant-calencar d-md-flex">
               <div className="wrap-header d-flex align-items-center img" style={{ backgroundImage: `url(${bgImage})` }}>
-                <p id="reset">Today</p>
+                {/* <p id="reset">Today</p> */}
                 <div id="header" className="p-0">
                   <div className="head-info">
                     <div className="head-month"></div>
@@ -368,7 +419,7 @@ const CalendarComponent = () => {
                   </tbody>
                 </table>
                 <div className="d-flex justify-content-end mt-3">
-                  <Button variant="primary" onClick={() => setShowModal(true)}>
+                  <Button variant="primary" onClick={() => handleShowModal()}>
                     Додати тренування
                   </Button>
                 </div>
@@ -403,6 +454,10 @@ const CalendarComponent = () => {
                           </li>
                         ))}
                       </ul>
+                      <div className="d-flex justify-content-between">
+                        <Button variant="secondary" onClick={() => handleEditEvent(index)}>Редагувати</Button>
+                        <Button variant="danger" onClick={() => handleDeleteEvent(index)}>Видалити</Button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -412,9 +467,9 @@ const CalendarComponent = () => {
         </div>
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Додати тренування</Modal.Title>
+          <Modal.Title>{editEvent ? "Редагувати тренування" : "Додати тренування"}</Modal.Title>
         </Modal.Header>
         <Form noValidate validated={validated} onSubmit={handleAddEvent}>
           <Modal.Body>
@@ -430,7 +485,7 @@ const CalendarComponent = () => {
               <Form.Control.Feedback type="invalid">Будь ласка, введіть назву тренування.</Form.Control.Feedback>
             </Form.Group>
             {newEvent.exercises.map((exercise, exerciseIndex) => (
-              <div key={exerciseIndex} className="exercise-group" style={{paddingBottom: '0px', marginBottom: '0px'}}>
+              <div key={exerciseIndex} className="exercise-group">
                 <Form.Group controlId={`exerciseName-${exerciseIndex}`}>
                   <Form.Label>Назва вправи</Form.Label>
                   <Form.Control
@@ -508,7 +563,7 @@ const CalendarComponent = () => {
             >
               Додати вправу
             </Button>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
+            <Button variant="secondary" onClick={handleCloseModal}>
               Закрити
             </Button>
             <Button variant="primary" type="submit">
@@ -516,8 +571,8 @@ const CalendarComponent = () => {
             </Button>
           </Modal.Footer>
         </Form>
-        
       </Modal>
+
     </section>
   );
 };

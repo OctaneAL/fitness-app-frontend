@@ -19,13 +19,13 @@ function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = await register(username, password);
     if (success) {
-      history.push('/');
+      navigate('/');
     } else {
       alert('Invalid credentials');
     }

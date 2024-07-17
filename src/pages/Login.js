@@ -6,14 +6,14 @@ import { Container, Form, Button } from 'react-bootstrap';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     console.log(username, password);
     e.preventDefault();
     const success = await login(username, password);
     if (success) {
-      history.push('/');
+      navigate('/');
     } else {
       alert('Invalid credentials');
     }
