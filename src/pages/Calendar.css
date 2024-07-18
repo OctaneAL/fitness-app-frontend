@@ -77,6 +77,27 @@ hr {
   background-color: #f9f9f9;
 }
 
+.set-details {
+  border: 1px solid #ccc;
+  padding: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background-color: #e9ecef;
+}
+
+.set-details h4 {
+  font-size: 1.2em;
+  color: #2c3e50;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.set-details input {
+  margin-bottom: 5px;
+}
+
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 0.5rem; }
@@ -8241,7 +8262,7 @@ h1, h2, h3, h4, h5,
 
 .next-button {
   right: 5px; }
-
+  
 .button-wrap {
   position: relative;
   padding: 10px 0; }

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Card } from 'react-bootstrap';
 import '../pages/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
 import { v4 as uuidv4 } from 'uuid';
+
+import WorkoutCard from './WorkoutCard';
+import ExerciseCard from './ExerciseCard';
 
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
@@ -13,7 +16,7 @@ const CalendarComponent = () => {
     id: uuidv4(),
     name: '',
     date: '',
-    exercises: [{ name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }]
+    exercises: [{ name: '', sets: 1, details: [{ repeats: '', weight: '' }] }]
   };
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -128,6 +131,9 @@ const CalendarComponent = () => {
       };
 
       Calendar.prototype.clickDay = function (o) {
+        if (o.innerHTML === '') {
+          return;
+        }
         const selected = document.getElementsByClassName('selected');
         const len = selected.length;
         if (len !== 0) {
@@ -317,7 +323,7 @@ const CalendarComponent = () => {
   
     updatedExercises[exerciseIndex].details = Array(sets)
       .fill(null)
-      .map((_, idx) => updatedExercises[exerciseIndex].details[idx] || { repeats: 1, weight: '' });
+      .map((_, idx) => updatedExercises[exerciseIndex].details[idx] || { repeats: '', weight: '' });
     setNewEvent({ ...newEvent, exercises: updatedExercises });
   };
   
@@ -434,7 +440,23 @@ const CalendarComponent = () => {
                   </div>
                 </div>
               </div>
-              <div className="training-list-wrap" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
+              <Container className="mt-4">
+                <div className="training-list-wrap" style={{ maxHeight: '600px', overflowY: 'auto', padding: '0px' }}>
+                  {filteredEvents.map((workout, index) => (
+                    <Card className="mb-4">
+                      <Card.Header as="h5" style={{ marginBottom: "1rem" }}>{workout.name}</Card.Header>
+                      {workout.exercises.map((exercise, index) => (
+                        <ExerciseCard key={index} exercise={exercise} />
+                      ))}<div className="d-flex justify-content-between">
+                        <Button variant="secondary" style={{ margin: '10px', marginTop: '0px' }} onClick={() => handleEditEvent(workout.id)}>Редагувати</Button>
+                        <Button variant="danger" style={{ margin: '10px', marginTop: '0px' }} onClick={() => handleDeleteEvent(workout.id)}>Видалити</Button>
+                      </div>
+                      
+                    </Card>
+                  ))}
+                </div>
+              </Container>
+              {/* <div className="training-list-wrap" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
                 <ul className="list-group">
                   {filteredEvents.map((event, index) => (
                     <li key={index} className="list-group-item">
@@ -460,7 +482,7 @@ const CalendarComponent = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -511,8 +533,9 @@ const CalendarComponent = () => {
                 </Form.Group>
                 {exercise.details.map((detail, setIndex) => (
                   <div key={setIndex} className="set-details">
+                    <h4>Підхід {setIndex + 1}</h4>
                     <Form.Group controlId={`exerciseRepeats-${exerciseIndex}-${setIndex}`}>
-                      <Form.Label>Кількість повторів (Підхід {setIndex + 1})</Form.Label>
+                      <Form.Label>Кількість повторів</Form.Label>
                       <Form.Control
                         type="number"
                         placeholder="Введіть кількість повторів"
@@ -524,7 +547,7 @@ const CalendarComponent = () => {
                       <Form.Control.Feedback type="invalid">Кількість повторів повинна бути більше 0.</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId={`exerciseWeight-${exerciseIndex}-${setIndex}`}>
-                      <Form.Label>Вага (кг) (Підхід {setIndex + 1})</Form.Label>
+                      <Form.Label>Вага (кг)</Form.Label>
                       <Form.Control
                         type="number"
                         placeholder="Введіть вагу"
@@ -540,7 +563,7 @@ const CalendarComponent = () => {
                 <div className="d-flex justify-content-between w-100">
                   <Button
                     variant="danger"
-                    style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+                    style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto', marginBottom: '0px' }}
                     onClick={() => {
                       const updatedExercises = newEvent.exercises.filter((_, i) => i !== exerciseIndex);
                       setNewEvent({ ...newEvent, exercises: updatedExercises });
@@ -557,7 +580,7 @@ const CalendarComponent = () => {
               variant="secondary"
               style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
               onClick={() =>
-                setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: 1, weight: '' }] }] })
+                setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: '', weight: '' }] }] })
               }
             >
               Додати вправу
