@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/auth';
+import { login, useAuth } from '../services/auth';
 import { Container, Form, Button } from 'react-bootstrap';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { setAuthState } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    console.log(username, password);
     e.preventDefault();
-    const success = await login(username, password);
+    const success = await login(username, password, setAuthState);
     if (success) {
       navigate('/');
     } else {

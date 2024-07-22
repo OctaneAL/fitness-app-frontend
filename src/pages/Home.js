@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import './Home.css'; // Додайте цей імпорт
+import ExerciseComponent from '../components/ExerciseComponent';
 
 function Home() {
   return (
@@ -38,6 +39,7 @@ function Home() {
           <p>Quotes from satisfied users.</p>
         </Col>
       </Row>
+      <ExerciseComponent />
     </Container>
   );
 }

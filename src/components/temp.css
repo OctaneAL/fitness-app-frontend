@@ -1,0 +1,50 @@
+/* src/ExerciseComponent.css */
+
+.three-dots {
+    color: #000;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 28px; /* Increase the size of the dots */
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-left: 16px; /* Increase the clickable area */
+    padding-right: 16px; /* Increase the clickable area */
+  }
+  
+  .three-dots::after {
+    display: none;
+  }
+  
+.custom-dropdown .dropdown-toggle::after {
+    display: none !important; /* Hide the default caret */
+  }
+  .custom-dropdown .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    margin-top: 0.25rem;
+  }
+  .card-title {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+  .custom-dropdown .dropdown-item {
+    font-size: 14px;
+  }
+
+  .dropdown-button .btn-secondary {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 1.5rem;
+    padding: 0;
+    color: #000;
+  }
+  
+  .dropdown-button .btn-secondary:hover,
+  .dropdown-button .btn-secondary:focus,
+  .dropdown-button .btn-secondary:active {
+    background-color: transparent;
+    box-shadow: none;
+  }

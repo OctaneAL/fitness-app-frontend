@@ -6,7 +6,7 @@ import './Calendar.css';
 const Calendar = () => {
   return (
     <div>
-      <h1>Calendar</h1>
+      {/* <h1>Calendar</h1> */}
       <CalendarComponent />
     </div>
   );

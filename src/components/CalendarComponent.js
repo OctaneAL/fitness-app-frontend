@@ -6,7 +6,7 @@ import '../pages/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
 import { v4 as uuidv4 } from 'uuid';
 
-import WorkoutCard from './WorkoutCard';
+// import WorkoutCard from './WorkoutCard';
 import ExerciseCard from './ExerciseCard';
 
 const CalendarComponent = () => {
