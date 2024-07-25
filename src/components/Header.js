@@ -16,7 +16,7 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/calendar">Workouts</Nav.Link>
+            <Nav.Link as={Link} to="/workout">Workouts</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
             {!isAuthenticated && (

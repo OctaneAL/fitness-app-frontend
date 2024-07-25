@@ -1,40 +1,30 @@
 import React, { useState } from 'react';
-import { Button, Card, Container, Row, Col, Dropdown, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import './temp.css'; // Import the custom CSS
+import { Card, Row, Col, Dropdown } from 'react-bootstrap';
+import '../styles/ExerciseComponent.css'; // Import the custom CSS
 
-const ExerciseComponent = () => {
+const ExerciseComponent = ({ workout, onEditEvent, onDeleteEvent }) => {
   const [view, setView] = useState('month');
 
   const handleViewChange = (val) => setView(val);
 
-  const handleEdit = () => {
-    // Add your edit logic here
-    alert('Edit workout');
-  };
-
-  const handleDelete = () => {
-    // Add your delete logic here
-    alert('Delete workout');
-  };
+  function getPlannedVolume(workout) { // no need for this func, it will be written in DB field
+    let res = 0;
+    for (let exercise of workout.exercises){
+      for (let detail of exercise.details){
+        res += parseInt(detail.weight) * parseInt(detail.repeats);
+      }
+    }
+    return res;
+  }
 
   return (
-    <Container className="mt-4">
-      <Row className="mb-4">
-        <ToggleButtonGroup type="radio" name="viewOptions" defaultValue="month" onChange={handleViewChange}>
-          <ToggleButton id="week" value="week">
-            Week
-          </ToggleButton>
-          <ToggleButton id="month" value="month">
-            Month
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Row>
-      <Row>
-        <Card className="mb-3">
-          <Card.Body>
+    // <Container className="mt-4">
+      // <Row>
+        <Card className="mb-3 shadow" style = {{ borderRadius: "15px" }}>
+          <Card.Body style={{ paddingTop: "0.5rem", paddingBottom: "0.5rem" }}>
             <Row>
-              <Col>
-                <Card.Title>Unnamed Routine</Card.Title>
+              <Col style = {{ paddingTop: "0.75rem" }}>
+                <Card.Title as="h4">{workout.name}</Card.Title>
               </Col>
               <Col className="text-end" style = {{ paddingRight: "0 px" }}>
                 <Dropdown className="custom-dropdown">
@@ -43,8 +33,8 @@ const ExerciseComponent = () => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu align="end">
-                    <Dropdown.Item onClick={handleEdit}>Edit</Dropdown.Item>
-                    <Dropdown.Item onClick={handleDelete}>Delete</Dropdown.Item>
+                    <Dropdown.Item onClick={() => onEditEvent(workout.id)}>View/Edit</Dropdown.Item>
+                    <Dropdown.Item onClick={() => onDeleteEvent(workout.id)}>Delete</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </Col>
@@ -53,23 +43,21 @@ const ExerciseComponent = () => {
               Chest Fly, Chest Press Machine
             </Card.Text>
             <Row>
-              <Col>
-                <p><strong>Planned Volume:</strong> 1,997,800 kg</p>
+              <Col style={{ textAlign: "center" }}>
+                <p><strong>Planned Volume:</strong> {getPlannedVolume(workout)} kg</p>
               </Col>
-              <Col>
-                <p><strong>Est Duration:</strong> 47:30</p>
+              <Col style={{ textAlign: "center" }}>
+                <p><strong>Est Duration:</strong> {workout.duration} minutes</p>
               </Col>
-              <Col>
+              <Col style={{ textAlign: "center" }}>
                 <p><strong>Est Calories:</strong> 354</p>
               </Col>
             </Row>
           </Card.Body>
         </Card>
-      </Row>
-      <Row>
-        <Button variant="primary">Build Routine</Button>
-      </Row>
-    </Container>
+      // </Row>
+      
+    // </Container>
   );
 };
 

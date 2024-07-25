@@ -7,11 +7,12 @@ import Protected from './pages/Protected';
 import Calendar from './pages/Calendar';
 import Header from './components/Header'; 
 import Profile from './pages/Profile'
+import Workout from './pages/Workout'
 
 // import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './services/auth'; 
 
-import './App.css'; // Додайте цей імпорт
+import './styles/App.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,7 +28,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
-            <Route path="/calendar" element={<Calendar />} />
+            {/* <Route path="/calendar" element={<Calendar />} /> */}
+            <Route path="/workout" element={<Workout />} />
             <Route path="/protected" element={<Protected />} />
             <Route path="/profile" element={<Profile />} /> {/*має бути protected */}
           </Routes>

@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { Modal, Button, Form } from 'react-bootstrap';
-// import '../pages/Calendar.css';
-import { v4 as uuidv4 } from 'uuid';
+import '../styles/CalendarMonth.css';
 
-const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
-  const [events, setEvents] = useState([]);
-
+const CalendarComponent = ({ selectedDate, setSelectedDate, workouts }) => {
   useEffect(() => {
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
@@ -30,48 +26,58 @@ const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
       }
     };
 
+    const highlightWorkoutDays = (year, month) => {
+      const days = document.getElementsByTagName('td');
+      const workoutDates = workouts.map(workout => workout.date.split('T')[0]);
+      for (let day of days) {
+        if (day.innerHTML === '') {
+          day.id = 'disabled';
+          continue;
+        }
+        let x = parseInt(day.innerHTML) + 1;
+        const date = new Date(year, month, x).toISOString().split('T')[0];
+        if (workoutDates.includes(date)) {
+          day.classList.add('workout-day');
+        } else {
+          day.classList.remove('workout-day');
+        }
+      }
+    };
+
     const initCalendar = () => {
-      const Calendar = function (selector, options) {
-        this.options = options;
+      const Calendar = function () {
         this.draw();
       };
 
       Calendar.prototype.draw = function () {
-        this.getCookie('selected_day');
         this.getOptions();
         this.drawDays();
+        this.drawHeader();
         const that = this;
-        // const reset = document.getElementById('reset');
         const pre = document.getElementsByClassName('pre-button');
         const next = document.getElementsByClassName('next-button');
 
         pre[0].addEventListener('click', () => that.preMonth());
         next[0].addEventListener('click', () => that.nextMonth());
-        // reset.addEventListener('click', () => that.reset());
 
-        const days = document.getElementsByTagName('td');
-        let daysLen = days.length;
-        while (daysLen--) {
-          days[daysLen].addEventListener('click', function () {
-            that.clickDay(this);
-          });
-        }
-
-         // Automatically select today's date on initial load
-        const today = new Date();
-        const todayCell = Array.from(days).find(day => day.innerHTML == today.getDate() && day.id !== 'disabled');
-        if (todayCell) {
-          this.clickDay(todayCell);
-        }
-        console.log(selectedDate);
+        this.highlightToday();
+        highlightWorkoutDays(year, month);
       };
 
-      Calendar.prototype.drawHeader = function (e) {
-        // const headDay = document.getElementsByClassName('head-day');
-        const headMonth = document.getElementsByClassName('head-month');
-        console.log(headMonth);
+      Calendar.prototype.highlightToday = function () {
+        const today = new Date();
+        const days = document.getElementsByTagName('td');
+        for (let day of days) {
+          if (today.getMonth() === month && today.getFullYear() === year && day.innerHTML == today.getDate() && day.id !== 'disabled') {
+            day.id = 'today';
+          } else {
+            day.id = '';
+          }
+        }
+      };
 
-        // e ? (headDay[0].innerHTML = e) : (headDay[0].innerHTML = day);
+      Calendar.prototype.drawHeader = function () {
+        const headMonth = document.getElementsByClassName('head-month');
         headMonth[0].textContent = `${monthTag[month]} - ${year}`;
       };
 
@@ -79,60 +85,20 @@ const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
         const startDay = new Date(year, month, 1).getDay();
         const nDays = new Date(year, month + 1, 0).getDate();
         let n = startDay;
+        const days = document.getElementsByTagName('td');
 
         for (let k = 0; k < 42; k++) {
           days[k].innerHTML = '';
           days[k].id = '';
-          days[k].className = '';
         }
 
         for (let i = 1; i <= nDays; i++) {
           days[n].innerHTML = i;
           n++;
         }
-
-        for (let j = 0; j < 42; j++) {
-          if (days[j].innerHTML === '') {
-            days[j].id = 'disabled';
-          } else if (j === day + startDay - 1) {
-            if (
-              (this.options && month === setDate.getMonth() && year === setDate.getFullYear()) ||
-              (!this.options && month === today.getMonth() && year === today.getFullYear())
-            ) {
-              this.drawHeader(day);
-              days[j].id = 'today';
-            }
-          }
-          if (selectedDay) {
-            if (
-              j === selectedDay.getDate() + startDay - 1 &&
-              month === selectedDay.getMonth() &&
-              year === selectedDay.getFullYear()
-            ) {
-              days[j].className = 'selected';
-              this.drawHeader(selectedDay.getDate());
-            }
-          }
-        }
-      };
-
-      Calendar.prototype.clickDay = function (o) {
-        if (o.innerHTML === '') {
-          return;
-        }
-        const selected = document.getElementsByClassName('selected');
-        const len = selected.length;
-        if (len !== 0) {
-          selected[0].className = '';
-        }
-
-        let x = parseInt(o.innerHTML, 10) + 1; // Adding 1 cuz somehow it decreases by 1 in toISOSString func
-        o.className = 'selected';
-        selectedDay = new Date(year, month, x);
-        this.drawHeader(o.innerHTML);
-        this.setCookie('selected_day', 1);
-        // Set selected date
-        setSelectedDate(selectedDay.toISOString().split('T')[0]);
+        
+        this.highlightToday();
+        highlightWorkoutDays(year, month);
       };
 
       Calendar.prototype.preMonth = function () {
@@ -142,7 +108,8 @@ const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
         } else {
           month -= 1;
         }
-        this.drawHeader(1);
+        this.updateSelectedDate();
+        this.drawHeader();
         this.drawDays();
       };
 
@@ -153,92 +120,45 @@ const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
         } else {
           month += 1;
         }
-        this.drawHeader(1);
+        this.updateSelectedDate();
+        this.drawHeader();
         this.drawDays();
+      };
+
+      Calendar.prototype.updateSelectedDate = function () {
+        const newDate = new Date(year, month + 1, 1);
+        setSelectedDate(newDate.toISOString().split('T')[0]);
       };
 
       Calendar.prototype.getOptions = function () {
         if (this.options) {
           const sets = this.options.split('-');
           setDate = new Date(sets[0], sets[1] - 1, sets[2]);
-          day = setDate.getDate();
           year = setDate.getFullYear();
           month = setDate.getMonth();
         }
       };
 
-      Calendar.prototype.reset = function () {
-        month = today.getMonth();
-        year = today.getFullYear();
-        day = today.getDate();
-        this.options = undefined;
-        this.drawDays();
-      };
-
-      Calendar.prototype.setCookie = function (name, expiredays) {
-        let expires = '';
-        if (expiredays) {
-          const date = new Date();
-          date.setTime(date.getTime() + expiredays * 24 * 60 * 60 * 1000);
-          expires = '; expires=' + date.toGMTString();
-        }
-        document.cookie = name + '=' + selectedDay + expires + '; path=/';
-      };
-
-      Calendar.prototype.getCookie = function (name) {
-        if (document.cookie.length) {
-          const arrCookie = document.cookie.split(';');
-          const nameEQ = name + '=';
-          for (let i = 0, cLen = arrCookie.length; i < cLen; i++) {
-            let c = arrCookie[i];
-            while (c.charAt(0) === ' ') {
-              c = c.substring(1, c.length);
-            }
-            if (c.indexOf(nameEQ) === 0) {
-              selectedDay = new Date(c.substring(nameEQ.length, c.length));
-            }
-          }
-        }
-      };
-
-      const today = new Date();
+      const today = new Date(selectedDate);
       let year = today.getFullYear();
       let month = today.getMonth();
       const monthTag = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
+        'January', 'February', 'March', 'April', 'May', 'June', 'July',
+        'August', 'September', 'October', 'November', 'December'
       ];
-      let day = today.getDate();
-      const days = document.getElementsByTagName('td');
-      let selectedDay;
       let setDate;
-      // let daysLen = days.length;
-      // const calendar = new Calendar();
       new Calendar();
     };
-
+    
     loadJQueryAndBootstrap();
-  }, []);
-
-  const filteredEvents = selectedDate ? events.filter((event) => event.date == selectedDate) : events;
+  }, [setSelectedDate, workouts]);
 
   return (
     <section>
-      <div className="container mt-5">
+      <div className="container mt-5" style={{ marginBottom: "1rem" }}>
         <div className="row">
           <div className="col-md-12">
             <div className="calendar elegant-calencar d-md-flex">
-              
               <div className="calendar-wrap">
                 <div className="container">
                   <div className="row align-items-center">
@@ -330,10 +250,8 @@ const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
               </div>
             </div>
           </div>
-          
         </div>
       </div>
-
     </section>
   );
 };

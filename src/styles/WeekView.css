@@ -1,0 +1,67 @@
+.week-view {
+    text-align: center;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.summary {
+    margin: 20px 0;
+}
+
+.days {
+    display: flex;
+    justify-content: space-around;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* розмір дня */
+    height: 40px;
+    background-color: lightgrey;
+    border-radius: 50%;
+}
+
+.day.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.day span {
+    font-size: 1.2rem;
+}
+
+.workout-summary {
+    margin-top: 20px;
+}
+
+.workout-group {
+    margin-bottom: 20px;
+}
+
+.workout-group h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.exercise {
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}

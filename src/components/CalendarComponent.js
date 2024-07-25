@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import { Modal, Button, Form, Container, Card } from 'react-bootstrap';
-import '../pages/Calendar.css';
+// import '../styles/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
 import { v4 as uuidv4 } from 'uuid';
 
 // import WorkoutCard from './WorkoutCard';
-import ExerciseCard from './ExerciseCard';
+// import ExerciseCard from './ExerciseCard';
 
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
@@ -440,7 +440,7 @@ const CalendarComponent = () => {
                   </div>
                 </div>
               </div>
-              <Container className="mt-4">
+              {/* <Container className="mt-4">
                 <div className="training-list-wrap" style={{ maxHeight: '600px', overflowY: 'auto', padding: '0px' }}>
                   {filteredEvents.map((workout, index) => (
                     <Card className="mb-4">
@@ -455,7 +455,7 @@ const CalendarComponent = () => {
                     </Card>
                   ))}
                 </div>
-              </Container>
+              </Container> */}
               {/* <div className="training-list-wrap" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
                 <ul className="list-group">
                   {filteredEvents.map((event, index) => (
