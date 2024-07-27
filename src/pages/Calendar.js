@@ -1,4 +1,3 @@
-// src/pages/Calendar.js
 import React from 'react';
 import CalendarComponent from '../components/CalendarComponent';
 // import './Calendar.css';

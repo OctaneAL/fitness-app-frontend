@@ -44,7 +44,7 @@ const ExerciseComponent = ({ workout, onEditEvent, onDeleteEvent }) => {
             </Card.Text>
             <Row>
               <Col style={{ textAlign: "center" }}>
-                <p><strong>Planned Volume:</strong> {getPlannedVolume(workout)} kg</p>
+                <p><strong>Planned Volume:</strong> {workout.planned_volume} kg</p>
               </Col>
               <Col style={{ textAlign: "center" }}>
                 <p><strong>Est Duration:</strong> {workout.duration} minutes</p>

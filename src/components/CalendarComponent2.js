@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { Modal, Button, Form } from 'react-bootstrap';
 // import '../pages/Calendar.css';
-import { v4 as uuidv4 } from 'uuid';
 
 const CalendarComponent = ({ selectedDate, setSelectedDate }) => {
   const [events, setEvents] = useState([]);

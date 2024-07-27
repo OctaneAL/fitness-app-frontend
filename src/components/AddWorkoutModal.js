@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { getExerciseCatalog } from '../services/api'
 
-const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent, setNewEvent, validated, editEventId }) => {
+const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent, setNewEvent, validated, editEventId, initialExerciseState }) => {
     const handleInputChange = (e, exerciseIndex, field, setIndex = null) => {
       const value = e.target.value;
       const updatedExercises = [...newEvent.exercises];
@@ -25,13 +26,28 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
       setNewEvent({ ...newEvent, exercises: updatedExercises });
     };
 
-    const exerciseOptions = [
-      'Жим лежачи',
-      'Присідання',
-      'Мертва тяга',
-      'Підтягування',
-      'Біцепс на лавці Скотта'
-    ];
+    // const exerciseOptions = [
+    //   { id: 0, name: 'Жим лежачи' },
+    //   { id: 1, name: 'Присідання' },
+    //   { id: 2, name: 'Мертва тяга' },
+    //   { id: 3, name: 'Підтягування' },
+    //   { id: 4, name: 'Біцепс на лавці Скотта' }
+    // ];
+    // let exerciseOptions = [];
+
+    const [exerciseOptions, setExerciseOptions] = useState([]);
+
+    useEffect(() => {
+      getExerciseCatalog()
+          .then(data => {
+              setExerciseOptions(data);
+          })
+          .catch(error => {
+              // setError(error.message);
+              // setLoading(false);
+              console.log("bad, bro");
+          });
+  }, []);
 
     return (
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -92,14 +108,14 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                 <Form.Label>Назва вправи</Form.Label>
                 <Form.Control
                   as="select"
-                  value={exercise.name}
-                  onChange={(e) => handleInputChange(e, exerciseIndex, 'name')}
+                  value={exercise.exercise_catalog_id}
+                  onChange={(e) => handleInputChange(e, exerciseIndex, 'exercise_catalog_id')}
                   required
                 >
                   <option value="">Оберіть вправу</option>
-                  {exerciseOptions.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
+                  {exerciseOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
                     </option>
                   ))}
                 </Form.Control>
@@ -185,7 +201,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
             variant="secondary"
             style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
             onClick={() =>
-              setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, { name: '', sets: 1, details: [{ repeats: '', weight: '' }] }] })
+              setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, initialExerciseState] })
             }
           >
             Додати вправу

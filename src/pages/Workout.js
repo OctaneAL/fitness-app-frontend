@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeekView from '../components/WeekView'
 import MonthView from '../components/MonthView';
 import ToggleButton from '../components/WorkoutToggleButton';
@@ -6,6 +6,8 @@ import AddWorkoutModal from '../components/AddWorkoutModal';
 import { Button, Container, Row } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { startOfMonth, endOfMonth, eachDayOfInterval, getWeek, getYear } from 'date-fns';
+
+import { getAllWorkouts, updateWorkout, addWorkout, deleteWorkout } from '../services/api';
 
 // Функція для визначення унікального номера тижня
 const getUniqueWeekNumber = (date) => {
@@ -28,74 +30,36 @@ const getWeeksInMonth = (year, month) => {
   return weekNumbers;
 };
 
-// console.log(getUniqueWeekNumber("2024-06-29"));
-// console.log(getUniqueWeekNumber("2024-07-01"));
-
-// console.log(`Weeks in July 2024:`, getWeeksInMonth(2024, 7));
-
 // Головний компонент Workout
 const Workout = () => {
   const [validated, setValidated] = useState(false);
-  const [events, setEvents] = useState([
-    {
-      "id": "1759b35d-e3c9-483d-951c-fa83e7424672",
-      "name": "Груди",
-      "date": "2024-07-18",
-      "exercises": [
-          {
-              "name": "Жим лежачи",
-              "details": [
-                  {
-                      "repeats": "521356",
-                      "weight": "123"
-                  },
-                  {
-                      "repeats": "4124",
-                      "weight": "124"
-                  },
-                  {
-                      "repeats": "421",
-                      "weight": "142"
-                  }
-              ]
-          }
-      ],
-      "duration": "60"
-    },
-    {
-      "id": "1759b35d-e3c9-483d-951c-fa83e7424674",
-      "name": "Ноги",
-      "date": "2024-07-20",
-      "exercises": [
-          {
-              "name": "Присідання",
-              "details": [
-                  {
-                      "repeats": "52",
-                      "weight": "123"
-                  },
-                  {
-                      "repeats": "4124",
-                      "weight": "124"
-                  },
-                  {
-                      "repeats": "421",
-                      "weight": "142"
-                  }
-              ]
-          }
-      ],
-      "duration": "90"
-    }
-  ]);
+
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    getAllWorkouts()
+        .then(data => {
+            setEvents(data); // data вже є масивом
+            // setLoading(false);
+        })
+        .catch(error => {
+            // setError(error.message);
+            // setLoading(false);
+            console.log("bad, bro");
+        });
+}, []);
 
   const [showModal, setShowModal] = useState(false);
+
+  const initialExerciseState = { exercise_catalog_id: '', details: [{ repeats: '', weight: '' }] };
   const initialEventState = {
     id: uuidv4(),
     name: '',
     date: '',
-    exercises: [{ name: '', details: [{ repeats: '', weight: '' }] }]
+    planned_volume: '',
+    exercises: [initialExerciseState]
   };
+
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editEventId, setEditEventId] = useState(null);
 
@@ -109,12 +73,12 @@ const Workout = () => {
   };
 
   const handleDeleteEvent = (id) => {
+    deleteWorkout(id);
     const updatedEvents = events.filter((event) => event.id !== id);
     setEvents(updatedEvents);
   };
 
   const handleEditEvent = (id) => {
-    console.log("edit", id)
     const eventToEdit = events.find((evt) => evt.id === id);
     if (eventToEdit) {
       setNewEvent(eventToEdit);
@@ -122,18 +86,37 @@ const Workout = () => {
       setShowModal(true);
     }
   };
+
+  function getPlannedVolume(workout) {
+    let res = 0;
+    for (let exercise of workout.exercises){
+      for (let detail of exercise.details){
+        res += parseInt(detail.weight) * parseInt(detail.repeats);
+      }
+    }
+    return res;
+  }
   
   const handleAddEvent = (event) => {
     const form = event.currentTarget;
+    
     event.preventDefault();
     if (form.checkValidity() === false) {
       event.stopPropagation();
       setValidated(true);
     } else {
       let updatedEvents;
+      newEvent['planned_volume'] = getPlannedVolume(newEvent);
+      for (let exercise of newEvent['exercises']){
+        exercise['exercise_catalog_id'] = parseInt(exercise['exercise_catalog_id']);
+      }
       if (editEventId !== null) {
+        updateWorkout(editEventId, newEvent);
+        // setEvents(events.map(evt => (evt.id === editEventId ? newEvent : evt)));
         updatedEvents = events.map((evt) => (evt.id === editEventId ? { ...newEvent } : evt));
       } else {
+        const id = uuidv4();
+        addWorkout(id, newEvent);
         updatedEvents = [...events, { ...newEvent, id: uuidv4() }];
         
       }
@@ -141,6 +124,7 @@ const Workout = () => {
       handleCloseModal();
     }
   };
+
   const getCurrentWeek = () => {
     const now = new Date();
 
@@ -198,6 +182,7 @@ const Workout = () => {
           validated={validated}
           setNewEvent={setNewEvent}
           editEventId={null}
+          initialExerciseState={initialExerciseState}
         />
       </Container>
   );

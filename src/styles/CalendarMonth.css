@@ -8398,9 +8398,9 @@ h1, h2, h3, h4, h5,
         transform: none; /* Убираем анимации */
       }
       
-      #today {
+      /* #today {
         color: #000;
-      }
+      } */
       
       #today:after {
         border: 2px solid black;
