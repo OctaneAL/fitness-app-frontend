@@ -12,6 +12,7 @@ async function apiRequest(endpoint, method, body = null) {
 
     if (body) {
         options.body = JSON.stringify(body);
+        console.log(body);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
@@ -27,12 +28,24 @@ export async function getAllWorkouts() {
     return apiRequest('/workouts', 'GET');
 }
 
+export async function getAllUserWorkouts(user_id) {
+    console.log('zaebal', user_id);
+    return apiRequest(`/workouts/${user_id}`, 'GET');
+}
+
 export async function updateWorkout(id, workout) {
     return apiRequest(`/workout/${id}`, 'PUT', workout);
 };
 
-export async function addWorkout(id, workout) {
-    return apiRequest(`/workout/${id}`, 'POST', workout);
+export async function addWorkout(id, workout, user_id) {
+    return apiRequest(
+        `/workout/${id}`,
+        'POST',
+        {
+            workout: workout,
+            user_id: user_id,
+        },
+    );
 };
 
 export async function deleteWorkout(id) {

@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from 'react-
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Protected from './pages/Protected';
-import Calendar from './pages/Calendar';
+// import Protected from './pages/Protected';
+// import Calendar from './pages/Calendar';
 import Header from './components/Header'; 
 import Profile from './pages/Profile'
 import Workout from './pages/Workout'
@@ -29,9 +29,12 @@ function App() {
               <Route path="/register" element={<Register />} />
             </Route>
             {/* <Route path="/calendar" element={<Calendar />} /> */}
-            <Route path="/workout" element={<Workout />} />
-            <Route path="/protected" element={<Protected />} />
-            <Route path="/profile" element={<Profile />} /> {/*має бути protected */}
+            
+            {/* <Route path="/protected" element={<Protected />} /> */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/workout" element={<Workout />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
           </Routes>
         </div>
         {/* <Footer /> */}
@@ -41,9 +44,23 @@ function App() {
 }
 
 export const AnonymousRoute = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
   
   return isAuthenticated ? <Navigate to="/" /> : <Outlet />
 }
+
+export const ProtectedRoute = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+};
 
 export default App;

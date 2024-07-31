@@ -5,49 +5,24 @@ import ToggleButton from '../components/WorkoutToggleButton';
 import AddWorkoutModal from '../components/AddWorkoutModal';
 import { Button, Container, Row } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-import { startOfMonth, endOfMonth, eachDayOfInterval, getWeek, getYear } from 'date-fns';
 
-import { getAllWorkouts, updateWorkout, addWorkout, deleteWorkout } from '../services/api';
+import { useAuth } from '../services/auth';
+
+import { getAllUserWorkouts, updateWorkout, addWorkout, deleteWorkout } from '../services/api';
 
 // Функція для визначення унікального номера тижня
-const getUniqueWeekNumber = (date) => {
-  const year = getYear(date);
-  const week = getWeek(date);
-  return `${year}-${week}`;
-};
-
-// Функція для визначення всіх тижнів у місяці
-const getWeeksInMonth = (year, month) => {
-  const firstDayOfMonth = startOfMonth(new Date(year, month - 1));
-  const lastDayOfMonth = endOfMonth(new Date(year, month - 1));
-  const allDays = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth });
-
-  const weekNumbers = new Set();
-  allDays.forEach(date => {
-    weekNumbers.add(getUniqueWeekNumber(date));
-  });
-
-  return weekNumbers;
-};
+// import { getWeek, getYear } from 'date-fns';
+// const getUniqueWeekNumber = (date) => {
+//   const year = getYear(date);
+//   const week = getWeek(date);
+//   return `${year}-${week}`;
+// };
 
 // Головний компонент Workout
 const Workout = () => {
   const [validated, setValidated] = useState(false);
 
   const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    getAllWorkouts()
-        .then(data => {
-            setEvents(data); // data вже є масивом
-            // setLoading(false);
-        })
-        .catch(error => {
-            // setError(error.message);
-            // setLoading(false);
-            console.log("bad, bro");
-        });
-}, []);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -63,7 +38,22 @@ const Workout = () => {
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editEventId, setEditEventId] = useState(null);
 
+  const { user_id } = useAuth();
+
   const [view, setView] = useState('week');
+
+  useEffect(() => {
+    getAllUserWorkouts(user_id)
+        .then(data => {
+            setEvents(data); // data вже є масивом
+            // setLoading(false);
+        })
+        .catch(error => {
+            // setError(error.message);
+            // setLoading(false);
+            console.log("bad, bro");
+        });
+}, [user_id]);
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -106,17 +96,19 @@ const Workout = () => {
       setValidated(true);
     } else {
       let updatedEvents;
+      
       newEvent['planned_volume'] = getPlannedVolume(newEvent);
       for (let exercise of newEvent['exercises']){
         exercise['exercise_catalog_id'] = parseInt(exercise['exercise_catalog_id']);
       }
+
       if (editEventId !== null) {
         updateWorkout(editEventId, newEvent);
         // setEvents(events.map(evt => (evt.id === editEventId ? newEvent : evt)));
         updatedEvents = events.map((evt) => (evt.id === editEventId ? { ...newEvent } : evt));
       } else {
         const id = uuidv4();
-        addWorkout(id, newEvent);
+        addWorkout(id, newEvent, user_id);
         updatedEvents = [...events, { ...newEvent, id: uuidv4() }];
         
       }
