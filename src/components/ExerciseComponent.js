@@ -50,7 +50,7 @@ const ExerciseComponent = ({ workout, onEditEvent, onDeleteEvent }) => {
                 <p><strong>Est Duration:</strong> {workout.duration} minutes</p>
               </Col>
               <Col style={{ textAlign: "center" }}>
-                <p><strong>Est Calories:</strong> 354</p>
+                <p><strong>Total Exercises:</strong> {workout.exercises.length}</p>
               </Col>
             </Row>
           </Card.Body>

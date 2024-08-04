@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import ExerciseComponent from './ExerciseComponent';
-import { Container } from 'react-bootstrap';
+import { Container, Col, Row } from 'react-bootstrap';
 import '../styles/WeekView.css';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurrentWeek }) => {
     const [currentWeekWorkouts, setCurrentWeekWorkouts] = useState([]);
@@ -93,43 +96,54 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
 }, [currentWeek, workouts]);
 
     return (
-      <Container>
-        {/* <div>
-          <h2>Тренування за тиждень</h2>
-          {workouts.map((workout, index) => (
-            <ExerciseComponent key={index} workout={workout} onEditEvent={onEditEvent} onDeleteEvent={onDeleteEvent} />
-          ))}
-        </div> */}
-        <div className="week-view">
-        <div className="header">
-            <button onClick={() => setCurrentWeek(getPreviousWeek())}>&lt;</button>
-            <h4>{formatDate(currentWeek.start)} – {formatDate(currentWeek.end)}</h4>
-            <button onClick={() => setCurrentWeek(getNextWeek())}>&gt;</button>
-        </div>
-        <div className="summary">
-            <h2>{countExerciseDays()} of 5 exercise days</h2>
-            <p>You exercised a total of {countTotalExercises()} times</p>
-        </div>
-        <div className="days">
-            {Array.from({ length: 7 }, (_, index) => renderDayStatus(index))}
-        </div>
-    </div>
-    <div className="workout-summary">
-            {Object.keys(groupedWorkouts).map(date => (
-                <div key={date} className="workout-group">
-                    <h3>{new Date(date).toDateString()}</h3>
-                    {groupedWorkouts[date].map((workout, index) => (
-                        <ExerciseComponent
-                            key={index}
-                            workout={workout}
-                            onEditEvent={onEditEvent}
-                            onDeleteEvent={onDeleteEvent}
-                        />
-                    ))}
+        <Container>
+            <div className="week-view">
+                <Row className="d-flex align-items-center justify-content-center">
+                    <Col>
+                        <div
+                            className="d-inline-block align-items-center justify-content-center arrow-button"
+                            onClick={() => setCurrentWeek(getPreviousWeek())}
+                        >
+                            <FontAwesomeIcon icon={faChevronLeft} size="2x" className="text-primary" />
+                        </div>
+                    </Col>
+                    <Col>
+                        <h4 style = {{ marginBottom: "0px" }} >{formatDate(currentWeek.start)} – {formatDate(currentWeek.end)}</h4>
+                    </Col>
+                    <Col>
+                        <div
+                            className="d-inline-block align-items-center justify-content-center arrow-button"
+                            onClick={() => setCurrentWeek(getNextWeek())}
+                        >
+                            <FontAwesomeIcon icon={faChevronRight} size="2x" className="text-primary" />
+                        </div>
+                    </Col>
+                </Row>
+                <div className="summary">
+                    <h2>{countExerciseDays()} of 5 exercise days</h2>
+                    <p>You exercised a total of {countTotalExercises()} times</p>
                 </div>
-            ))}
-        </div></Container>
-      );
+                <div className="days">
+                    {Array.from({ length: 7 }, (_, index) => renderDayStatus(index))}
+                </div>
+            </div>
+            <div className="workout-summary">
+                {Object.keys(groupedWorkouts).map(date => (
+                    <div key={date} className="workout-group">
+                        <h3>{new Date(date).toDateString()}</h3>
+                        {groupedWorkouts[date].map((workout, index) => (
+                            <ExerciseComponent
+                                key={index}
+                                workout={workout}
+                                onEditEvent={onEditEvent}
+                                onDeleteEvent={onDeleteEvent}
+                            />
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </Container>
+    );
 } 
 
 export default WeekView;

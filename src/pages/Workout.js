@@ -124,7 +124,7 @@ const Workout = () => {
     const month = now.getMonth();
     const day = now.getDay();
     
-    const firstDayOfWeek = new Date(year, month, day);
+    const firstDayOfWeek = new Date(year, month + 1, day);
     
     firstDayOfWeek.setDate(now.getDate() - now.getDay());
     // firstDayOfWeek.setUTCHours(0, 0, 0, 0);
@@ -137,6 +137,7 @@ const Workout = () => {
 
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  
 
   return (
       <Container className="mt-5">
@@ -162,7 +163,7 @@ const Workout = () => {
             className="mt-3"
             onClick={() => setShowModal(true)}
           >
-            Додати тренування
+            Add workout
           </Button>
         </Row>
         

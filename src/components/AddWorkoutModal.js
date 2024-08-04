@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row } from 'react-bootstrap';
 import { getExerciseCatalog } from '../services/api'
+import WindowedSelect, { createFilter } from 'react-windowed-select';
 
 const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent, setNewEvent, validated, editEventId, initialExerciseState }) => {
+    
+
+    const [selectValid, setSelectValid] = useState(newEvent.exercises.map(() => true));  
+
     const handleInputChange = (e, exerciseIndex, field, setIndex = null) => {
-      const value = e.target.value;
+      let value = null;
+      if (e !== null){
+        value = e.target.value;
+      }
+      
       const updatedExercises = [...newEvent.exercises];
+
       if (setIndex === null) {
         updatedExercises[exerciseIndex][field] = value;
       } else {
@@ -26,6 +36,33 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
       setNewEvent({ ...newEvent, exercises: updatedExercises });
     };
 
+    const handleSelectChange = (selectedOption, exerciseIndex) => {
+      let e = null
+      if (selectedOption !== null){
+        e = { target: { value: selectedOption.value } }
+        setSelectValid((prev) => prev.map((valid, index) => index === exerciseIndex ? true : valid));
+      } else {
+          setSelectValid((prev) => prev.map((valid, index) => index === exerciseIndex ? false : valid));
+      }
+      handleInputChange(
+        e,
+        exerciseIndex,
+        'exercise_catalog_id'
+      );
+    };
+
+    const validateForm = (event) => {
+      const form = event.currentTarget;
+      const isValid = form.checkValidity();
+      const selectValidation = newEvent.exercises.map(exercise => !!exercise.exercise_catalog_id);
+      setSelectValid(selectValidation);
+      
+      if (!isValid || selectValidation.includes(false)) {
+          event.preventDefault();
+          event.stopPropagation();
+      }
+  };
+
     // const exerciseOptions = [
     //   { id: 0, name: 'Жим лежачи' },
     //   { id: 1, name: 'Присідання' },
@@ -37,30 +74,36 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
 
     const [exerciseOptions, setExerciseOptions] = useState([]);
 
+    const options = exerciseOptions.map((option) => ({
+      value: option.id,
+      label: option.name,
+    }));
+    // const [options, setOptions] = useState([]);
+
+    // const { onMouseMove, onMouseOver, ...newInnerProps } = options.innerProps
+
+    
+    
+
     useEffect(() => {
       getExerciseCatalog()
           .then(data => {
               setExerciseOptions(data);
           })
-          .catch(error => {
-              // setError(error.message);
-              // setLoading(false);
-              console.log("bad, bro");
-          });
   }, []);
-
+  
     return (
       <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>{editEventId ? "Редагувати тренування" : "Додати тренування"}</Modal.Title>
+        <Modal.Title>{editEventId ? "Edit workout" : "Add workout"}</Modal.Title>
       </Modal.Header>
-      <Form noValidate validated={validated} onSubmit={handleAddEvent}>
+      <Form noValidate validated={validated} onSubmit={(e) => { validateForm(e); handleAddEvent(e); }}>
         <Modal.Body>
           <Form.Group controlId="eventName">
-            <Form.Label>Назва тренування</Form.Label>
+            <Form.Label>Name of the workout</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Введіть назву тренування"
+              placeholder="Enter the name of the workout"
               value={newEvent.name}
               onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
               required
@@ -69,7 +112,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
           </Form.Group>
 
           <Form.Group controlId="eventDate">
-            <Form.Label>День тренування</Form.Label>
+            <Form.Label>Date of the workout</Form.Label>
             <Form.Control
               type="date"
               value={newEvent.date}
@@ -91,10 +134,10 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
           </Form.Group> */}
 
           <Form.Group controlId="duration">
-            <Form.Label>Приблизний час тренування (хвилини)</Form.Label>
+            <Form.Label>Approximate workout time (minutes)</Form.Label>
             <Form.Control
               type="number"
-              placeholder="Введіть тривалість тренування"
+              placeholder="Enter the duration of your workout"
               value={newEvent.duration}
               onChange={(e) => setNewEvent({ ...newEvent, duration: e.target.value })}
               required
@@ -105,20 +148,20 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
           {newEvent.exercises.map((exercise, exerciseIndex) => (
             <div key={exerciseIndex} className="exercise-group">
               <Form.Group style={{ marginBottom: "0.5rem" }} controlId={`exerciseName-${exerciseIndex}`}>
-                <Form.Label>Назва вправи</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={exercise.exercise_catalog_id}
-                  onChange={(e) => handleInputChange(e, exerciseIndex, 'exercise_catalog_id')}
-                  required
-                >
-                  <option value="">Оберіть вправу</option>
-                  {exerciseOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </Form.Control>
+                {/* <Form.Label>Name of the exercise</Form.Label> */}
+
+                <WindowedSelect
+                  // styles={customStyles}
+                  defaultValue={null}
+                  value={options.find(option => option.value === exercise.exercise_catalog_id)}
+                  onChange={(e) => handleSelectChange(e, exerciseIndex)}
+                  options={options}
+                  placeholder="Select exercise"
+                  isClearable={true}
+                  isSearchable={true}
+                  filterOption={createFilter({ignoreAccents: false})}
+                  className={selectValid[exerciseIndex] ? "" : "is-invalid"}
+                />
                 <Form.Control.Feedback type="invalid">Будь ласка, оберіть назву вправи.</Form.Control.Feedback>
               </Form.Group>
 
@@ -179,7 +222,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                 variant="link"
                 onClick={() => handleAddSet(exerciseIndex)}
               >
-                Додати новий підхід
+                Add set
               </Button>
               <div className="d-flex justify-content-between w-100">
                 <Button
@@ -190,7 +233,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                     setNewEvent({ ...newEvent, exercises: updatedExercises });
                   }}
                 >
-                  Видалити вправу
+                  Delete exercise
                 </Button>
               </div>
             </div>
@@ -204,13 +247,14 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
               setNewEvent({ ...newEvent, exercises: [...newEvent.exercises, initialExerciseState] })
             }
           >
-            Додати вправу
+            Add exercise
           </Button>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Закрити
-          </Button>
-          <Button variant="primary" type="submit">
-            Зберегти
+          <Button
+            variant="primary"
+            type="submit" 
+            style={{ margin: '10px', marginLeft: 'auto', marginRight: 'auto' }}
+          >
+            Save
           </Button>
         </Modal.Footer>
       </Form>
