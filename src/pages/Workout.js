@@ -124,7 +124,7 @@ const Workout = () => {
     const month = now.getMonth();
     const day = now.getDay();
     
-    const firstDayOfWeek = new Date(year, month + 1, day);
+    const firstDayOfWeek = new Date(year, month, day);
     
     firstDayOfWeek.setDate(now.getDate() - now.getDay());
     // firstDayOfWeek.setUTCHours(0, 0, 0, 0);
