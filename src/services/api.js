@@ -62,6 +62,50 @@ export async function getExerciseCatalog() {
     return apiRequest('/exercise_catalog', 'GET');
 };
 
+export async function getMuscleGroups() {
+    return apiRequest('/muscle_groups', 'GET');
+};
+
+export async function filterExercises({
+    targetMuscleGroupId,
+    name,
+    difficultyIds,
+    equipmentIds,
+    bodyRegionIds
+}) {
+    const params = new URLSearchParams();
+
+    if (targetMuscleGroupId) params.append('target_muscle_group_id', targetMuscleGroupId);
+    if (name) params.append('name', name);
+    if (difficultyIds.length > 0) params.append('difficulty_ids', difficultyIds.join(','));
+    if (equipmentIds.length > 0) params.append('equipment_ids', equipmentIds.join(','));
+    if (bodyRegionIds.length > 0) params.append('body_region_ids', bodyRegionIds.join(','));
+
+    console.log(`/filter_exercises?${params.toString()}`);
+
+    return apiRequest(`/filter_exercises?${params.toString()}`, 'GET');
+}
+
+export async function getDifficulties() {
+    return apiRequest('/difficulties', 'GET');
+};
+
+export async function getEquipment() {
+    return apiRequest('/equipment', 'GET');
+};
+
+export async function getBodyRegions() {
+    return apiRequest('/body_regions', 'GET');
+};
+
+export async function getBodyRegionsForMuscleGroup(muscle_group_id) {
+    return apiRequest(`/body_regions/${muscle_group_id}`, 'GET');
+};
+
+export async function getMuscleGroupId(muscle_group_name) {
+    return apiRequest(`/muscle_group_id/${muscle_group_name}`, 'GET');
+};
+
 
 // Statistics
 export async function getTotalWorkouts(user_id) {

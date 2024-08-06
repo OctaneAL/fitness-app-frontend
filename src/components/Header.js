@@ -19,6 +19,9 @@ function Header() {
             {isAuthenticated && (
               <Nav.Link as={Link} to="/workout">Workouts</Nav.Link>
             )}
+            {isAuthenticated && (
+              <Nav.Link as={Link} to="/exercises">Exercises</Nav.Link>
+            )}
           </Nav>
           <Nav className="ms-auto">
             {!isAuthenticated && (

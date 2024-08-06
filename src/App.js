@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from 'react-
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-// import Protected from './pages/Protected';
-// import Calendar from './pages/Calendar';
+import MuscleGroupCatalog from './pages/MuscleGroupCatalog';
 import Header from './components/Header'; 
 import Profile from './pages/Profile'
 import Workout from './pages/Workout'
+import Exercises from './pages/Exercises'
 
 // import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './services/auth'; 
@@ -28,13 +28,14 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
-            {/* <Route path="/calendar" element={<Calendar />} /> */}
             
-            {/* <Route path="/protected" element={<Protected />} /> */}
             <Route element={<ProtectedRoute />}>
               <Route path="/workout" element={<Workout />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
+
+            <Route path="/exercises" element={<Exercises />} />
+            <Route path="/exercises/:muscle_group" element={<MuscleGroupCatalog />} />
           </Routes>
         </div>
         {/* <Footer /> */}
