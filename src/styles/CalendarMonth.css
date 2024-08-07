@@ -8383,7 +8383,7 @@ h1, h2, h3, h4, h5,
         left: 50%;
         transform: translate(-50%, -50%);
         box-sizing: border-box;
-        transition: none; /* Убираем анимации */
+        transition: none;
       }
       
       tbody td {
@@ -8396,23 +8396,42 @@ h1, h2, h3, h4, h5,
       }
       
       tbody td:active {
-        transform: none; /* Убираем анимации */
+        transform: none;
       }
       
       /* #today {
         color: #000;
       } */
       
-      #today:after {
-        border: 2px solid black;
-      }
+      #today {
+        position: relative;
+        z-index: 1;
+    }
+
+    #today::before {
+      content: '';
+      display: block;
+      padding-top: 50%; /* додаткові 2 пікселі з кожного боку */
+      border-radius: 50%;
+      border: 2.5px solid #ff6300; /* колір бордюру для today */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 46px;
+      height: 46px;
+      transform: translate(-50%, -50%);
+      box-sizing: border-box;
+      z-index: -1;
+  }
       
       .workout-day {
         color: #fff;
       }
       
       .workout-day:after {
-        background-color: #259423; /* Цвет фона для дней с тренировками */
+        /* background-color: #259423; */
+        
+        background-color: #337faf;
       }
       
       #disabled {
@@ -8440,7 +8459,7 @@ h1, h2, h3, h4, h5,
         padding: 0 0.5em;
         border: 1px solid rgba(255, 255, 255, 0.4);
         border-radius: 4px;
-        transition: none; /* Убираем анимации */
+        transition: none;
         text-transform: uppercase;
         font-size: 11px;
       }
@@ -8451,5 +8470,5 @@ h1, h2, h3, h4, h5,
       }
       
       #reset:active {
-        transform: none; /* Убираем анимации */
+        transform: none;
       }}

@@ -61,7 +61,7 @@ export const ProtectedRoute = () => {
     return null;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/register" />;
 };
 
 export default App;

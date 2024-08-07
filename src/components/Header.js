@@ -5,13 +5,17 @@ import { useAuth } from '../services/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
+// import logo from '%PUBLIC_URL%/logo_png_256_black.png';
+
 function Header() {
   const { isAuthenticated, username, logout } = useAuth();
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">StayFit</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">
+          <img src="/logo_png_256_black.png" alt="Logo" height="60" />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

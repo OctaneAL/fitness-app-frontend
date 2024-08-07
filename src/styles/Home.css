@@ -1,3 +1,42 @@
 .home-page {
   height: 100%;
 }
+
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://vitruve.fit/wp-content/uploads/2024/05/Why-Am-I-Struggling-To-Lift-Heavier-Weights_.jpg') no-repeat center center;
+  background-size: cover;
+  min-height: 60vh;
+  padding: 2rem 0;
+}
+
+.hero-section h1 {
+  color: #fff;
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.hero-section p {
+  font-weight: 600;
+}
+
+.card-animation {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-animation:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.list-unstyled {
+  font-size: 1.1rem;
+}
+
+.list-unstyled li {
+  margin: 8px 0;
+}

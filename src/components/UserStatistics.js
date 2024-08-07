@@ -5,6 +5,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDumbbell, faClock, faRepeat, faWeightHanging } from '@fortawesome/free-solid-svg-icons';
 
 const UserStatistics = ({ totalWorkouts, totalDuration, totalSets, totalWeight }) => {
+  const convertMinsToHrs = (duration_minutes) => {
+    let duration = "";
+    let hours = ~~(duration_minutes / 60);
+    let mins = duration_minutes % 60;
+
+    if (hours > 0) duration += hours.toString() + " hrs ";
+    if (mins > 0) duration += mins.toString() + " mins";
+    if (duration === "") duration = "0 mins";
+
+    return duration;
+  }
+
   const stats = [
     {
       icon: faDumbbell,
@@ -14,7 +26,7 @@ const UserStatistics = ({ totalWorkouts, totalDuration, totalSets, totalWeight }
     {
       icon: faClock,
       title: 'Total Duration',
-      value: totalDuration
+      value: convertMinsToHrs(totalDuration)
     },
     {
       icon: faRepeat,

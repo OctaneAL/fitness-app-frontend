@@ -145,7 +145,7 @@ const Workout = () => {
           <ToggleButton view={view} setView={setView} />
         </Row>
         <Row>
-            {view === 'week' ? <WeekView workouts={events} onEditEvent={handleEditEvent} onDeleteEvent={handleDeleteEvent} currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} /> : <MonthView exercises={events} setView={setView} setCurrentWeek={setCurrentWeek} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />}
+            {view === 'week' ? <WeekView workouts={events} onEditEvent={handleEditEvent} onDeleteEvent={handleDeleteEvent} currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} thisWeek={getCurrentWeek()} /> : <MonthView exercises={events} setView={setView} setCurrentWeek={setCurrentWeek} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />}
             
             {/* <Row className="w-100">
               <ExerciseBriefComponent />
@@ -159,8 +159,8 @@ const Workout = () => {
         </Row>
         <Row>
           <Button
-            variant="success"
-            className="mt-3"
+            variant="primary"
+            className="mt-3 mb-4"
             onClick={() => setShowModal(true)}
           >
             Add workout

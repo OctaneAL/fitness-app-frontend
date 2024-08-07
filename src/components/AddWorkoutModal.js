@@ -42,7 +42,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
         e = { target: { value: selectedOption.value } }
         setSelectValid((prev) => prev.map((valid, index) => index === exerciseIndex ? true : valid));
       } else {
-          setSelectValid((prev) => prev.map((valid, index) => index === exerciseIndex ? false : valid));
+        setSelectValid((prev) => prev.map((valid, index) => index === exerciseIndex ? false : valid));
       }
       handleInputChange(
         e,
@@ -108,7 +108,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
               onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
               required
             />
-            <Form.Control.Feedback type="invalid">Будь ласка, введіть назву тренування.</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">Please enter the name of the workout.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="eventDate">
@@ -119,7 +119,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
               onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
               required
             />
-            <Form.Control.Feedback type="invalid">Будь ласка, виберіть день тренування.</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">Please select a workout date.</Form.Control.Feedback>
           </Form.Group>
 
           {/* <Form.Group controlId="startTime">
@@ -142,7 +142,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
               onChange={(e) => setNewEvent({ ...newEvent, duration: e.target.value })}
               required
             />
-            <Form.Control.Feedback type="invalid">Будь ласка, введіть тривалість тренування.</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">Please enter the duration of your workout.</Form.Control.Feedback>
           </Form.Group>
 
           {newEvent.exercises.map((exercise, exerciseIndex) => (
@@ -162,7 +162,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                   filterOption={createFilter({ignoreAccents: false})}
                   className={selectValid[exerciseIndex] ? "" : "is-invalid"}
                 />
-                <Form.Control.Feedback type="invalid">Будь ласка, оберіть назву вправи.</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">Please select the name of the exercise.</Form.Control.Feedback>
               </Form.Group>
 
               {exercise.details.map((detail, setIndex) => (
@@ -185,7 +185,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                           />
                           <em style={{paddingLeft: "8px"}}>kg</em>
                         </div>
-                        <Form.Control.Feedback type="invalid">Будь ласка, введіть вагу.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">Please enter the weight.</Form.Control.Feedback>
                       </Form.Group>
                     </div>
 
@@ -202,7 +202,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
                           />
                           <em style={{paddingLeft: "8px"}}>reps</em>
                         </div>
-                        <Form.Control.Feedback type="invalid">Кількість повторів повинна бути більше 0.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">The number of repetitions must be greater than 0.</Form.Control.Feedback>
                       </Form.Group>
                     </div>
 

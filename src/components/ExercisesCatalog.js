@@ -19,9 +19,19 @@ function ExerciseCatalog() {
 
     return (
         <Container className="my-4">
+            <h1 className="text-center mb-4">Exercise Catalog</h1>
+            <p className="text-center mb-4">
+                Choose a category to find new exercises based on their characteristics, such as difficulty, target muscle group, equipment, and body region.
+            </p>
             <Row>
                 {muscleGroups.map((muscle_group, index) => (
-                    <Col xs={6} md={3} lg={3} className="mb-3" key={index}>
+                    <Col
+                        xs={index === muscleGroups.length - 1 ? 12 : 6}
+                        md={4} 
+                        lg={4}
+                        className="mb-3"
+                        key={index}
+                    >
                         <Link to={`/exercises/${toUrlFormat(muscle_group)}`}>
                             <Card className="text-center h-100">
                                 <CardBody className="d-flex flex-column align-items-center">

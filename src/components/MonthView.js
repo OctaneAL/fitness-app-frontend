@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import CalendarComponent from '../components/CalendarMonthComponent';
 import ExerciseBriefComponent from '../components/ExerciseBriefComponent';
+import NoWorkouts from './NoWorkoutsComponent';
 
 const MonthView = ({ exercises, setView, setCurrentWeek, selectedDate, setSelectedDate }) => {
     const [filteredExercises, setFilteredExercises] = useState([]);
@@ -66,9 +67,11 @@ const MonthView = ({ exercises, setView, setCurrentWeek, selectedDate, setSelect
     setFilteredExercises(nonEmptyFiltered);
 
   }, [exercises, selectedDate]);
+  
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-};
+  };
+
   const onWeekClick = (week) => {
     setCurrentWeek(week);
     setView('week');
@@ -77,11 +80,15 @@ const MonthView = ({ exercises, setView, setCurrentWeek, selectedDate, setSelect
     return (
       <div>
         <CalendarComponent selectedDate={selectedDate} setSelectedDate={setSelectedDate} workouts={exercises} />
-        {filteredExercises.map((week, index) => (
-        <div key={index} onClick={() => onWeekClick(week.week)}>
-          <ExerciseBriefComponent title={formatDate(week.week.start) + " - " + formatDate(week.week.end)} numberOfWorkouts={week.exercises.length}/>
-        </div>
-      ))}
+        { filteredExercises.length === 0 ? (
+            <NoWorkouts />
+          ) :
+          filteredExercises.map((week, index) => (
+            <div key={index} onClick={() => onWeekClick(week.week)}>
+              <ExerciseBriefComponent title={formatDate(week.week.start) + " - " + formatDate(week.week.end)} numberOfWorkouts={week.exercises.length}/>
+            </div>
+          ))
+        }
       </div>
     );
 };

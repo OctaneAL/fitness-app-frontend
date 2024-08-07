@@ -1,6 +1,7 @@
 /* src/ExerciseComponent.css */
 .exercise-brief-container {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .exercise-brief-container:hover {

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import ExerciseComponent from './ExerciseComponent';
 import { Container, Col, Row } from 'react-bootstrap';
 import '../styles/WeekView.css';
+import NoWorkouts from './NoWorkoutsComponent';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurrentWeek }) => {
+const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurrentWeek, thisWeek }) => {
     const [currentWeekWorkouts, setCurrentWeekWorkouts] = useState([]);
 
     const getNextWeek = () => {
@@ -66,34 +67,44 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
         );
     };
 
-  const groupedWorkouts = currentWeekWorkouts.reduce((groups, workout) => {
-    const date = workout.date.split('T')[0];
+    const groupedWorkouts = currentWeekWorkouts.reduce((groups, workout) => {
+        const date = workout.date.split('T')[0];
 
-    if (!groups[date]) {
-        groups[date] = [];
-    }
-    groups[date].push(workout);
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+        groups[date].push(workout);
 
-    // Sorting by dates
-    const sortedDates = Object.keys(groups).sort((a, b) => new Date(a) - new Date(b));
+        const sortedDates = Object.keys(groups).sort((a, b) => new Date(a) - new Date(b));
 
-    const sortedGroupedWorkouts = sortedDates.reduce((sortedAcc, date) => {
-      sortedAcc[date] = groups[date];
-      return sortedAcc;
+        const sortedGroupedWorkouts = sortedDates.reduce((sortedAcc, date) => {
+                sortedAcc[date] = groups[date];
+                return sortedAcc;
+            }, {});
+
+        return sortedGroupedWorkouts;
     }, {});
 
-    return sortedGroupedWorkouts;
-}, {});
+    const formatWeek = (week) => {
+        if (week.start.getTime() === thisWeek.start.getTime()) return "This week";
 
-  
-  useEffect(() => {
-    const filteredWorkouts = workouts.filter(workout => {
-        let workoutDate = strToUTCDate(workout.date);
+        let output = formatDate(currentWeek.start) + " - " + formatDate(currentWeek.end);
+        
+        if (week.start.getFullYear() !== thisWeek.start.getFullYear()) output += " " + week.start.getFullYear().toString();
 
-        return workoutDate >= currentWeek.start && workoutDate <= currentWeek.end;
-    });
-    setCurrentWeekWorkouts(filteredWorkouts);
-}, [currentWeek, workouts]);
+        return output;
+    }
+
+    useEffect(() => {
+        const filteredWorkouts = workouts.filter(workout => {
+            let workoutDate = strToUTCDate(workout.date);
+
+            return workoutDate >= currentWeek.start && workoutDate <= currentWeek.end;
+        });
+        setCurrentWeekWorkouts(filteredWorkouts);
+    }, [currentWeek, workouts]);
+
+
 
     return (
         <Container>
@@ -108,7 +119,7 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
                         </div>
                     </Col>
                     <Col>
-                        <h4 style = {{ marginBottom: "0px" }} >{formatDate(currentWeek.start)} – {formatDate(currentWeek.end)}</h4>
+                        <h3 style = {{ marginBottom: "0px" }}> {formatWeek(currentWeek)} </h3>
                     </Col>
                     <Col>
                         <div
@@ -120,7 +131,7 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
                     </Col>
                 </Row>
                 <div className="summary">
-                    <h2>{countExerciseDays()} of 5 exercise days</h2>
+                    <h2>{countExerciseDays()} of 7 exercise days</h2>
                     <p>You exercised a total of {countTotalExercises()} times</p>
                 </div>
                 <div className="days">
@@ -128,12 +139,15 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
                 </div>
             </div>
             <div className="workout-summary">
-                {Object.keys(groupedWorkouts).map(date => (
+                { Object.keys(groupedWorkouts).length === 0 ? (
+                    <NoWorkouts />
+                ) :
+                Object.keys(groupedWorkouts).map(date => (
                     <div key={date} className="workout-group">
                         <h3>{new Date(date).toDateString()}</h3>
                         {groupedWorkouts[date].map((workout, index) => (
                             <ExerciseComponent
-                                key={index}
+                                key={`${date}-${index}`}
                                 workout={workout}
                                 onEditEvent={onEditEvent}
                                 onDeleteEvent={onDeleteEvent}

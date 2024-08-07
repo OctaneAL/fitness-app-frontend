@@ -4,12 +4,12 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer
 } from 'recharts';
 
-const sampleDifficultyData = [
-  { name: 'Beginner', value: 40 },
-  { name: 'Intermediate', value: 30 },
-  { name: 'Advanced', value: 20 },
-  { name: 'Expert', value: 10 }
-];
+// const sampleDifficultyData = [
+//   { name: 'Beginner', value: 40 },
+//   { name: 'Intermediate', value: 30 },
+//   { name: 'Advanced', value: 20 },
+//   { name: 'Expert', value: 10 }
+// ];
 
 const progressData = [
   { name: 'Week 1', Beginner: 10, Intermediate: 5, Advanced: 2, Expert: 1 },
@@ -34,7 +34,7 @@ const DifficultyStatistics = ( { difficultyData }) => {
                                     cx="50%"
                                     cy="50%"
                                     labelLine={false}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    // label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                     outerRadius={80}
                                     fill="#8884d8"
                                     dataKey="value"
@@ -43,7 +43,13 @@ const DifficultyStatistics = ( { difficultyData }) => {
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                            <Tooltip />
+                                <Tooltip 
+                                    formatter={(value, name, entry) => {
+                                        const total = difficultyData.reduce((acc, item) => acc + item.value, 0);
+                                        const percent = ((entry.value / total) * 100).toFixed(0);
+                                        return [`${percent}%`, entry.name];
+                                    }}
+                                />
                             <Legend />
                             </PieChart>
                         </ResponsiveContainer>

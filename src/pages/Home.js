@@ -1,68 +1,108 @@
 import React from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import '../styles/Home.css';
+import statisticsImage from '../assets/images/statistics.jfif';
+import gymBroImage from '../assets/images/gym-bro-reading-at-the-gym.jpg';
+import databaseImage from '../assets/images/database.webp';
+import { useAuth } from '../services/auth';
 
 function Home() {
-  return (
-    <Container className="home-page d-flex flex-column">
-      <Row className="my-5 flex-grow-1">
-        <Col className="text-center">
-          <h1>Welcome to MyApp</h1>
-          <p className="lead">Your application description here.</p>
-          <Button variant="primary" href="/register">Get Started</Button>
-        </Col>
-      </Row>
-      <Row className="my-5 flex-grow-1">
-        <Col md={4} className="text-center">
-          <h3>Feature 1</h3>
-          <p>Detail about feature 1.</p>
-        </Col>
-        <Col md={4} className="text-center">
-          <h3>Feature 2</h3>
-          <p>Detail about feature 2.</p>
-        </Col>
-        <Col md={4} className="text-center">
-          <h3>Feature 3</h3>
-          <p>Detail about feature 3.</p>
-        </Col>
-      </Row>
-      <Row className="my-5 flex-grow-1">
-        <Col className="text-center">
-          <h2>Why Choose Us?</h2>
-          <p>Additional details about why users should choose your app.</p>
-        </Col>
-      </Row>
-      <Row className="my-5 flex-grow-1">
-        <Col className="text-center">
-          <h2>Testimonials</h2>
-          <p>Quotes from satisfied users.</p>
-        </Col>
-      </Row>
-      {/* <div style={{ border: "1px solid #ccc", padding: "15px", paddingTop: "10px", paddingBottom: "10px", marginTop: "10px", borderRadius: "5px", backgroundColor: "#e9ecef" }}>
-        <Row>
-          <Col>
-            <ExerciseBriefComponent />
-          </Col>
-          <Col>
-            <ExerciseBriefComponent />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <ExerciseBriefComponent />
-          </Col>
-          <Col>
-            <ExerciseBriefComponent />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <ExerciseBriefComponent />
-          </Col>
-        </Row>
-      </div> */}
+  const { isAuthenticated } = useAuth();
 
-    </Container>
+  return (
+    <div className="homepage">
+      <header className="hero-section d-flex align-items-center justify-content-center text-center text-white">
+        <Container>
+          <h1 className="display-3">Transform Your Fitness Journey with EnergoFit</h1>
+          <p className="lead mt-3">
+            Discover a smarter way to track your workouts and reach your fitness goals. From personalized workout plans to comprehensive exercise databases, we have everything you need to stay motivated and achieve more.
+          </p>
+          {!isAuthenticated && (
+              <Button as={Link} to="/register" variant="primary" size="lg" className="mt-4">
+              Join Us Today
+            </Button>
+          )}
+        </Container>
+      </header>
+
+      <Container className="mt-5">
+        <Row className="text-center mb-5">
+          <Col xs={12} md={6} lg={4} className="mb-4">
+            <Card className="shadow-lg border-0 card-animation" style={{ borderRadius: "1rem" }}>
+              <Card.Img
+                variant="top"
+                // src="https://via.placeholder.com/300x200.png?text=Workout+Logging"
+                src={gymBroImage}
+                alt="Workout Logging"
+              />
+              <Card.Body>
+                <Card.Title>Effortless Workout Logging</Card.Title>
+                <Card.Text>
+                  Keep track of your workouts with ease. Our intuitive interface lets you log and manage your sessions efficiently.
+                </Card.Text>
+                <Button as={Link} to="/workout" variant="outline-dark">
+                  Log Workouts
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={12} md={6} lg={4} className="mb-4">
+            <Card className="shadow-lg border-0 card-animation" style={{ borderRadius: "1rem" }}>
+              <Card.Img
+                variant="top"
+                // src="https://via.placeholder.com/300x200.png?text=Statistics+Analysis"
+                src={statisticsImage}
+                alt="Statistics & Analysis"
+              />
+              <Card.Body>
+                <Card.Title>In-depth Statistics</Card.Title>
+                <Card.Text>
+                  Visualize your progress with detailed statistics and insights. Unlock the power of data to push your limits.
+                </Card.Text>
+                <Button as={Link} to="/profile" variant="outline-dark">
+                  View Stats
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={12} md={12} lg={4} className="mb-4">
+            <Card className="shadow-lg border-0 card-animation" style={{ borderRadius: "1rem" }}>
+              <Card.Img
+                variant="top"
+                // src="https://via.placeholder.com/300x200.png?text=Exercise+Database"
+                src={databaseImage}
+                alt="Exercise Database"
+              />
+              <Card.Body>
+                <Card.Title>Comprehensive Exercise Database</Card.Title>
+                <Card.Text>
+                  Explore new exercises with detailed descriptions and tutorials. Perfect your form and expand your routine.
+                </Card.Text>
+                <Button as={Link} to="/exercises" variant="outline-dark">
+                  Explore Exercises
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row className="text-center">
+          <Col>
+            <h3 className="mb-4">Our Vision for the Future</h3>
+            <p>
+              At EnergoFit, we believe in continuous innovation. Our future updates will bring new features like customizable workout templates, personalized training suggestions, and enhanced community interactions.
+            </p>
+            <ul className="list-unstyled mt-3">
+              <li>🌟 Custom workout templates</li>
+              <li>🌟 Favorite exercises</li>
+              <li>🌟 Advanced progress tracking</li>
+              <li>🌟 Community challenges</li>
+            </ul>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 

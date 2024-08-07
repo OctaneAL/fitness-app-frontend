@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Button, Table, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { filterExercises, getDifficulties, getEquipment, getBodyRegionsForMuscleGroup, getMuscleGroupId } from '../services/api'; // Import your filtering function
@@ -125,39 +125,77 @@ function MuscleGroupCatalog() {
         };
     }, [muscleGroupId])
 
+    const [containerHeight, setContainerHeight] = useState('auto');
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const updateContainerHeight = () => {
+            if (containerRef.current) {
+                const viewportHeight = window.innerHeight;
+                const offsetTop = containerRef.current.getBoundingClientRect().top;
+                const newHeight = viewportHeight - offsetTop - 20; // Adjust the -20 value as needed for padding/margin
+                setContainerHeight(`${newHeight}px`);
+            }
+        };
+    
+        const handleResize = () => {
+            requestAnimationFrame(updateContainerHeight);
+        };
+    
+        // Initial height update with interval until the element is rendered
+        const intervalId = setInterval(() => {
+            if (containerRef.current) {
+                updateContainerHeight();
+                clearInterval(intervalId);
+            }
+        }, 100);
+    
+        // Add resize event listener
+        window.addEventListener('resize', handleResize);
+    
+        // Cleanup event listener and interval on unmount
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            clearInterval(intervalId);
+        };
+    }, []);
+
     return (
         <Container className="muscle-group-page d-flex flex-column">
-            <Row className="mb-4">
-                <Col>
+            <Row className="mt-4">
+                <Col xs={12} md={6} lg={6} className="d-flex flex-column align-items-center justify-content-center mb-4">
                     <FormControl
                         placeholder="Exercise Name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
                 </Col>
-                <Col>
+                <Col xs={12} md={6} lg={6}  className="d-flex flex-column align-items-center justify-content-center mb-4">
                     <Select
                         placeholder="Difficulty"
                         options={difficultyOptions}
                         value={difficulty}
+                        className="w-100"
                         onChange={(selectedOptions) => setDifficulty(selectedOptions || [])}
                         isMulti
                     />
                 </Col>
-                <Col>
+                <Col xs={12} md={6} lg={6} className="d-flex flex-column align-items-center justify-content-center mb-4">
                     <Select
                         placeholder="Equipment"
                         options={equipmentOptions}
                         value={equipment}
+                        className="w-100"
                         onChange={(selectedOptions) => setEquipment(selectedOptions || [])}
                         isMulti
                     />
                 </Col>
-                <Col>
+                <Col xs={12} md={6} lg={6} className="d-flex flex-column align-items-center justify-content-center mb-4">
                     <Select
                         placeholder="Body Region"
                         options={bodyRegionOptions}
                         value={bodyRegion}
+                        className="w-100"
                         onChange={(selectedOptions) => setBodyRegion(selectedOptions || [])}
                         isMulti
                     />
@@ -168,6 +206,10 @@ function MuscleGroupCatalog() {
             </Button>
 
             {exercises.length > 0 && (
+                <div
+                    ref={containerRef}
+                    style={{ minHeight: '400px', maxHeight: containerHeight, overflowY: 'auto', overflowX: 'auto' }}
+                >
                 <Table striped bordered hover className="mt-4">
                     <thead>
                         <tr>
@@ -220,6 +262,7 @@ function MuscleGroupCatalog() {
                         ))}
                     </tbody>
                 </Table>
+                </div>
             )}
         </Container>
     );
