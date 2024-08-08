@@ -32,10 +32,10 @@ function ExerciseCatalog() {
                         className="mb-3"
                         key={index}
                     >
-                        <Link to={`/exercises/${toUrlFormat(muscle_group)}`}>
+                        <Link to={`/exercises/${toUrlFormat(muscle_group.name)}`}>
                             <Card className="text-center h-100">
                                 <CardBody className="d-flex flex-column align-items-center">
-                                    <Card.Title className="text-center" style={{ marginBottom: "0px"}}>{muscle_group}</Card.Title>
+                                    <Card.Title className="text-center" style={{ marginBottom: "0px"}}>{muscle_group.name}</Card.Title>
                                 </CardBody>
                             </Card>
                         </Link>

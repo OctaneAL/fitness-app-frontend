@@ -13,7 +13,6 @@ async function apiRequest(endpoint, method, body = null) {
 
     if (body) {
         options.body = JSON.stringify(body);
-        console.log(body);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
@@ -81,8 +80,6 @@ export async function filterExercises({
     if (equipmentIds.length > 0) params.append('equipment_ids', equipmentIds.join(','));
     if (bodyRegionIds.length > 0) params.append('body_region_ids', bodyRegionIds.join(','));
 
-    console.log(`/filter_exercises?${params.toString()}`);
-
     return apiRequest(`/filter_exercises?${params.toString()}`, 'GET');
 }
 
@@ -104,6 +101,18 @@ export async function getBodyRegionsForMuscleGroup(muscle_group_id) {
 
 export async function getMuscleGroupId(muscle_group_name) {
     return apiRequest(`/muscle_group_id/${muscle_group_name}`, 'GET');
+};
+
+export async function getFavoriteExercises(user_id) {
+    return apiRequest(`/favorite_exercises/${user_id}`, 'GET');
+};
+
+export async function addFavoriteExercise(user_id, exercise_catalog_id) {
+    return apiRequest(`/favorite_exercises/${user_id}`, 'POST', {exercise_catalog_id: parseInt(exercise_catalog_id)});
+};
+
+export async function deleteFavoriteExercise(user_id, exercise_catalog_id) {
+    return apiRequest(`/favorite_exercises/${user_id}`, 'DELETE', {exercise_catalog_id: parseInt(exercise_catalog_id)});
 };
 
 

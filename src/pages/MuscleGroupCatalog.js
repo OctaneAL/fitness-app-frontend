@@ -1,10 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Button, Table, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { filterExercises, getDifficulties, getEquipment, getBodyRegionsForMuscleGroup, getMuscleGroupId } from '../services/api'; // Import your filtering function
+import {
+    filterExercises, getDifficulties, getEquipment,
+    getBodyRegionsForMuscleGroup, getMuscleGroupId,
+    getFavoriteExercises, addFavoriteExercise, deleteFavoriteExercise
+} from '../services/api'; // Import your filtering function
 import Select from 'react-select';
+import { useAuth } from '../services/auth';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as faSolidHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faRegularHeart } from '@fortawesome/free-regular-svg-icons';
 
 function MuscleGroupCatalog() {
+    const { user_id } = useAuth();
+
     const fromUrlFormat = (url) => {
         return url.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };    
@@ -125,15 +136,43 @@ function MuscleGroupCatalog() {
         };
     }, [muscleGroupId])
 
+    const [favorites, setFavorites] = useState(new Set());
+
+    useEffect(() => {
+        if (typeof user_id !== "string"){
+            getFavoriteExercises(user_id)
+                .then(data => {
+                    setFavorites(new Set(data.map(exercise => exercise)));
+                });
+        }
+    }, [user_id]);
+
+    const toggleFavorite = async (exerciseId) => {
+        exerciseId = parseInt(exerciseId);
+
+        if (favorites.has(exerciseId)) {
+            deleteFavoriteExercise(user_id, exerciseId);
+            setFavorites(prev => {
+                const updated = new Set(prev);
+                updated.delete(parseInt(exerciseId));
+                return updated;
+            });
+        } else {
+            addFavoriteExercise(user_id, exerciseId);
+            setFavorites(prev => new Set(prev).add(exerciseId));
+        }
+    };
+
     const [containerHeight, setContainerHeight] = useState('auto');
     const containerRef = useRef(null);
 
+    // Calculate height of the table component. So it doesnt exceed screen height
     useEffect(() => {
         const updateContainerHeight = () => {
             if (containerRef.current) {
                 const viewportHeight = window.innerHeight;
                 const offsetTop = containerRef.current.getBoundingClientRect().top;
-                const newHeight = viewportHeight - offsetTop - 20; // Adjust the -20 value as needed for padding/margin
+                const newHeight = viewportHeight - offsetTop - 20;
                 setContainerHeight(`${newHeight}px`);
             }
         };
@@ -142,7 +181,6 @@ function MuscleGroupCatalog() {
             requestAnimationFrame(updateContainerHeight);
         };
     
-        // Initial height update with interval until the element is rendered
         const intervalId = setInterval(() => {
             if (containerRef.current) {
                 updateContainerHeight();
@@ -150,10 +188,8 @@ function MuscleGroupCatalog() {
             }
         }, 100);
     
-        // Add resize event listener
         window.addEventListener('resize', handleResize);
     
-        // Cleanup event listener and interval on unmount
         return () => {
             window.removeEventListener('resize', handleResize);
             clearInterval(intervalId);
@@ -213,6 +249,7 @@ function MuscleGroupCatalog() {
                 <Table striped bordered hover className="mt-4">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Name</th>
                             <th>Short Demonstration Link</th>
                             <th>In-Depth Demonstration Link</th>
@@ -230,6 +267,14 @@ function MuscleGroupCatalog() {
                     <tbody>
                         {exercises.map((exercise) => (
                             <tr key={exercise.id}>
+                                <td className="text-center align-middle">
+                                    <FontAwesomeIcon
+                                        icon={favorites.has(parseInt(exercise.id)) ? faSolidHeart : faRegularHeart}
+                                        size="2x"
+                                        className="text-primary"
+                                        onClick={() => toggleFavorite(exercise.id)}
+                                    />
+                                </td>
                                 <td>{exercise.name}</td>
                                 <td>
                                     {exercise.short_demonstration_link ? (

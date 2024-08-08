@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row } from 'react-bootstrap';
-import { getExerciseCatalog } from '../services/api'
 import WindowedSelect, { createFilter } from 'react-windowed-select';
+import { getMuscleGroups, filterExercises, getExerciseCatalog, getFavoriteExercises } from '../services/api';
+import { useAuth } from '../services/auth';
 
 const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent, setNewEvent, validated, editEventId, initialExerciseState }) => {
-    
-
     const [selectValid, setSelectValid] = useState(newEvent.exercises.map(() => true));  
+    const {user_id} = useAuth();
 
     const handleInputChange = (e, exerciseIndex, field, setIndex = null) => {
       let value = null;
@@ -63,35 +63,131 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
       }
   };
 
-    // const exerciseOptions = [
-    //   { id: 0, name: 'Жим лежачи' },
-    //   { id: 1, name: 'Присідання' },
-    //   { id: 2, name: 'Мертва тяга' },
-    //   { id: 3, name: 'Підтягування' },
-    //   { id: 4, name: 'Біцепс на лавці Скотта' }
-    // ];
-    // let exerciseOptions = [];
-
     const [exerciseOptions, setExerciseOptions] = useState([]);
+    const [exercises, setExercises] = useState([]);
+    const [muscleGroups, setMuscleGroups] = useState([]);
+    const [mapMuscleGroups, setMapMuscleGroups] = useState({});
 
-    const options = exerciseOptions.map((option) => ({
-      value: option.id,
-      label: option.name,
-    }));
-    // const [options, setOptions] = useState([]);
+    const [favoriteExercises, setFavoriteExercises] = useState([]);
+    const [favoriteOption, setFavoriteOption] = useState({});
 
-    // const { onMouseMove, onMouseOver, ...newInnerProps } = options.innerProps
-
+    const customStyles = {
+      groupHeading: (provided, state) => ({
+        ...provided,
+        backgroundColor: '#f0f0f0',
+        fontSize: '1.2rem',
+        padding: '10px 10px',
+        color: '#333',
+      }),
+    };
     
-    
-
     useEffect(() => {
       getExerciseCatalog()
           .then(data => {
-              setExerciseOptions(data);
+            setExerciseOptions(data);
           })
-  }, []);
+
+      getMuscleGroups()
+          .then(data => {
+            setMuscleGroups(data);
+          })
+
+      filterExercises({
+          targetMuscleGroupId: "",
+          name: "",
+          difficultyIds: [],
+          equipmentIds: [],
+          bodyRegionIds: []
+      })
+          .then(data => {
+            setExercises(data);
+          })
+    }, []);
+
+    useEffect(() => {
+      if (typeof user_id !== "string"){
+        getFavoriteExercises(user_id)
+          .then((data) => {
+            setFavoriteExercises(data);
+          })
+      }
+    }, [user_id])
+
+    useEffect(() => {
+      if (favoriteExercises.length > 0 && exercises.length > 0){
+        let mp = new Map();
+
+        for (let exercise of exercises) { 
+          mp.set(parseInt(exercise.id), exercise.name)
+        }
+        
+        let option = {};
+        option["label"] = "Favorite exercises";
+        option["options"] = [];
+
+        for (let id of favoriteExercises) {
+          option["options"].push({"label": mp.get(id), "value": id}); 
+        }
+
+        setFavoriteOption(option);
+      }
+    }, [favoriteExercises, exercises])
+
+    useEffect(() => {
+      let mp = new Map();
+
+      muscleGroups.forEach(group => {
+        mp.set(group.id, group.name);
+      });
+
+      setMapMuscleGroups(mp);
+    }, [muscleGroups])
+
+    useEffect(() => {
+      if (muscleGroups.length > 0 && exercises.length > 0 && mapMuscleGroups.size > 0) {
+        let mp = {};
+
+        for (let muscleGroup of muscleGroups){
+          mp[muscleGroup.name] = [];
+        }
+
+        for (let exercise of exercises){
+          let t_id = parseInt(exercise.target_muscle_group_id);
+
+          if (t_id === 0) continue;
+
+          let muscleGroupName = mapMuscleGroups.get(t_id);
+          
+          let t = {};
+          t["label"] = exercise.name;
+          t["value"] = parseInt(exercise.id);
+
+          mp[muscleGroupName].push(t);
+        }
   
+        let groupedOptions = [];
+  
+        for (let key of Object.keys(mp)){
+          groupedOptions.push({"label": key, "options": mp[key]});
+        }
+  
+        setExerciseOptions(groupedOptions);
+      }
+      
+    }, [muscleGroups, exercises, mapMuscleGroups])
+
+
+    const findOptionInGroups = (groups, value) => {
+      for (let group of groups) {
+        if (typeof group.options === "undefined") continue;
+        const option = group.options.find(opt => opt.value === value);
+        if (option) {
+          return option;
+        }
+      }
+      return null;
+    };
+    
     return (
       <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
@@ -140,6 +236,7 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
               placeholder="Enter the duration of your workout"
               value={newEvent.duration}
               onChange={(e) => setNewEvent({ ...newEvent, duration: e.target.value })}
+              min="0"
               required
             />
             <Form.Control.Feedback type="invalid">Please enter the duration of your workout.</Form.Control.Feedback>
@@ -148,19 +245,17 @@ const AddWorkoutModal = ({ showModal, handleCloseModal, handleAddEvent, newEvent
           {newEvent.exercises.map((exercise, exerciseIndex) => (
             <div key={exerciseIndex} className="exercise-group">
               <Form.Group style={{ marginBottom: "0.5rem" }} controlId={`exerciseName-${exerciseIndex}`}>
-                {/* <Form.Label>Name of the exercise</Form.Label> */}
-
                 <WindowedSelect
-                  // styles={customStyles}
                   defaultValue={null}
-                  value={options.find(option => option.value === exercise.exercise_catalog_id)}
+                  value={findOptionInGroups([favoriteOption, ...exerciseOptions], exercise.exercise_catalog_id)}
                   onChange={(e) => handleSelectChange(e, exerciseIndex)}
-                  options={options}
+                  options={[favoriteOption, ...exerciseOptions]}
                   placeholder="Select exercise"
                   isClearable={true}
                   isSearchable={true}
                   filterOption={createFilter({ignoreAccents: false})}
                   className={selectValid[exerciseIndex] ? "" : "is-invalid"}
+                  styles={customStyles}
                 />
                 <Form.Control.Feedback type="invalid">Please select the name of the exercise.</Form.Control.Feedback>
               </Form.Group>

@@ -7,16 +7,6 @@ const ExerciseComponent = ({ workout, onEditEvent, onDeleteEvent }) => {
 
   const handleViewChange = (val) => setView(val);
 
-  function getPlannedVolume(workout) { // no need for this func, it will be written in DB field
-    let res = 0;
-    for (let exercise of workout.exercises){
-      for (let detail of exercise.details){
-        res += parseInt(detail.weight) * parseInt(detail.repeats);
-      }
-    }
-    return res;
-  }
-
   return (
     // <Container className="mt-4">
       // <Row>

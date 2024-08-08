@@ -135,16 +135,21 @@ const WeekView = ({ workouts, onEditEvent, onDeleteEvent, currentWeek, setCurren
                     <p>You exercised a total of {countTotalExercises()} times</p>
                 </div>
                 <div className="days">
-                    {Array.from({ length: 7 }, (_, index) => renderDayStatus(index))}
+                    {/* {Array.from({ length: 7 }, (_, index) => renderDayStatus(index))} */}
+                    {Array.from({ length: 7 }, (_, index) => (
+                        <div key={index}>
+                            {renderDayStatus(index)}
+                        </div>
+                    ))}
                 </div>
             </div>
             <div className="workout-summary">
                 { Object.keys(groupedWorkouts).length === 0 ? (
                     <NoWorkouts />
                 ) :
-                Object.keys(groupedWorkouts).map(date => (
+                Object.keys(groupedWorkouts).map((date, index) => (
                     <div key={date} className="workout-group">
-                        <h3>{new Date(date).toDateString()}</h3>
+                        <h3 key={`h3-${date}-${index}`}>{new Date(date).toDateString()}</h3>
                         {groupedWorkouts[date].map((workout, index) => (
                             <ExerciseComponent
                                 key={`${date}-${index}`}

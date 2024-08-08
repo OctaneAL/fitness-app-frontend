@@ -31,6 +31,7 @@ const Workout = () => {
     id: uuidv4(),
     name: '',
     date: '',
+    duration: '',
     planned_volume: '',
     exercises: [initialExerciseState]
   };
