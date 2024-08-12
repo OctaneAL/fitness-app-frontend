@@ -117,32 +117,32 @@ export async function deleteFavoriteExercise(user_id, exercise_catalog_id) {
 
 
 // Statistics
-export async function getTotalWorkouts(user_id) {
-    return apiRequest(`/statistics/total-workouts/${user_id}`, 'GET');
+export async function getTotalWorkouts(user_name) {
+    return apiRequest(`/statistics/total-workouts/${user_name}`, 'GET');
 }
 
-export async function getTotalDuration(user_id) {
-    return apiRequest(`/statistics/total-duration/${user_id}`, 'GET');
+export async function getTotalDuration(user_name) {
+    return apiRequest(`/statistics/total-duration/${user_name}`, 'GET');
 }
 
-export async function getTotalSets(user_id) {
-    return apiRequest(`/statistics/total-sets/${user_id}`, 'GET');
+export async function getTotalSets(user_name) {
+    return apiRequest(`/statistics/total-sets/${user_name}`, 'GET');
 }
 
-export async function getTotalWeight(user_id) {
-    return apiRequest(`/statistics/total-weight/${user_id}`, 'GET');
+export async function getTotalWeight(user_name) {
+    return apiRequest(`/statistics/total-weight/${user_name}`, 'GET');
 }
 
-export async function getDifficultyDistribution(user_id) {
-    return apiRequest(`/statistics/difficulty-distribution/${user_id}`, 'GET');
+export async function getDifficultyDistribution(user_name) {
+    return apiRequest(`/statistics/difficulty-distribution/${user_name}`, 'GET');
 }
 
-export async function getMuscleGroupExerciseDistribution(user_id) {
-    return apiRequest(`/statistics/muscle-group-exercise-distribution/${user_id}`, 'GET');
+export async function getMuscleGroupExerciseDistribution(user_name) {
+    return apiRequest(`/statistics/muscle-group-exercise-distribution/${user_name}`, 'GET');
 }
 
-export async function getMuscleGroupWeightDistribution(user_id) {
-    return apiRequest(`/statistics/muscle-group-weight-distribution/${user_id}`, 'GET');
+export async function getMuscleGroupWeightDistribution(user_name) {
+    return apiRequest(`/statistics/muscle-group-weight-distribution/${user_name}`, 'GET');
 }
 
 export { apiRequest };

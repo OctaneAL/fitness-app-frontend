@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../styles/Home.css';
@@ -6,9 +6,18 @@ import statisticsImage from '../assets/images/statistics.jfif';
 import gymBroImage from '../assets/images/gym-bro-reading-at-the-gym.jpg';
 import databaseImage from '../assets/images/database.webp';
 import { useAuth } from '../services/auth';
+import toast, { Toaster } from 'react-hot-toast';
 
 function Home() {
   const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    const message = localStorage.getItem('toastMessage');
+    if (message) {
+      toast.success(message);
+      localStorage.removeItem('toastMessage');
+    }
+  }, []);
 
   return (
     <div className="homepage">
@@ -102,6 +111,7 @@ function Home() {
           </Col>
         </Row>
       </Container>
+      <Toaster />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { Modal, Button, Form, Container, Card } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 // import '../styles/Calendar.css';
 import bgImage from '../assets/images/bg.jpg';
 import { v4 as uuidv4 } from 'uuid';

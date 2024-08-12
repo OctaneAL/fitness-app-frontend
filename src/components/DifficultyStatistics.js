@@ -20,7 +20,19 @@ const progressData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+const COLORS_ = new Map();
+
+COLORS_.set("Novice", "#4caf50");        // Green for easy difficulty
+COLORS_.set("Beginner", "#8bc34a");      // Light Green
+COLORS_.set("Intermediate", "#ffeb3b");  // Yellow for medium difficulty
+COLORS_.set("Advanced", "#ff9800");      // Orange
+COLORS_.set("Expert", "#f44336");        // Red for hard difficulty
+COLORS_.set("Master", "#e91e63");        // Pink for expert difficulty
+COLORS_.set("Legend", "#9c27b0");        // Purple
+COLORS_.set("Grand Master", "#673ab7");  // Dark Purple for the hardest difficulty
+
 const DifficultyStatistics = ( { difficultyData }) => {
+    console.log(difficultyData);
     return (
         <Row> {/* className="mb-4" */}
             <Col xs={12} md={6} lg={6} className="mb-3">
@@ -40,7 +52,8 @@ const DifficultyStatistics = ( { difficultyData }) => {
                                     dataKey="value"
                                 >
                                     {difficultyData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    // <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    <Cell key={`cell-${index}`} fill={COLORS_.get(entry.name)} />
                                     ))}
                                 </Pie>
                                 <Tooltip 

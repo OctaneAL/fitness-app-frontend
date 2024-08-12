@@ -5,8 +5,6 @@ import { useAuth } from '../services/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-// import logo from '%PUBLIC_URL%/logo_png_256_black.png';
-
 function Header() {
   const { isAuthenticated, username, logout } = useAuth();
 
@@ -41,7 +39,7 @@ function Header() {
                   {username}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
+                  <Dropdown.Item as={Link} to={`/profile/${username}`}>My Profile</Dropdown.Item>
                   <Dropdown.Divider />
                   <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
                 </Dropdown.Menu>

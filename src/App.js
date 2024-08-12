@@ -5,9 +5,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MuscleGroupCatalog from './pages/MuscleGroupCatalog';
 import Header from './components/Header'; 
-import Profile from './pages/Profile'
-import Workout from './pages/Workout'
-import Exercises from './pages/Exercises'
+import Profile from './pages/Profile';
+import Workout from './pages/Workout';
+import Exercises from './pages/Exercises';
+import Error404 from './components/Error404';
 
 // import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './services/auth'; 
@@ -21,7 +22,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Header />
-        <div>
+        <div className="h-100">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route element={<AnonymousRoute />}>
@@ -31,11 +32,17 @@ function App() {
             
             <Route element={<ProtectedRoute />}>
               <Route path="/workout" element={<Workout />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile" element={<ProfileRedirect />} />
             </Route>
+
+            <Route path="/profile/:user_name" element={<Profile />} />
+
+            
 
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercises/:muscle_group" element={<MuscleGroupCatalog />} />
+            
+            <Route path="*" element={<Error404 />} />
           </Routes>
         </div>
         {/* <Footer /> */}
@@ -43,6 +50,17 @@ function App() {
     </AuthProvider>
   );
 }
+
+const ProfileRedirect = () => {
+  const { username, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  return <Navigate to={`/profile/${username}`} />;
+};
+
 
 export const AnonymousRoute = () => {
   const { isAuthenticated, loading } = useAuth();
