@@ -47,14 +47,11 @@ One of the main challenges was ensuring smooth interaction with a large dataset 
 
 ## Screenshots
 
-### Homepage
-![Homepage](./screenshots/homepage.png)
-
 ### User Profile
-![User Profile](./screenshots/profile.png)
+<img src="./screenshots/profile-page.png" alt="User Profile" width="600"/>
 
 ### Workout Template
-![Workout Template](./screenshots/workout-template.png)
+<img src="./screenshots/add-workout.png" alt="Log Workout" width="400"/>
 
 ## Getting Started
 
