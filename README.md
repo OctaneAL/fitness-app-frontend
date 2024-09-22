@@ -1,70 +1,76 @@
-# Getting Started with Create React App
+# Energo Fit - Front End
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Energo Fit is a web application for recording and tracking physical workouts. This platform allows users to easily create, edit, and view their workouts, monitor their progress, and use workout templates for convenience. The project features a large catalog with 2000+ exercises and offers various training features, such as user statistics, template usage, and favorite exercises management.
 
-## Available Scripts
+## Main Features
 
-In the project directory, you can run:
+- **Authentication**: 
+  - User registration and login using JWT tokens.
+  
+- **User Profile**:
+  - Displays detailed user statistics with all workouts.
+  - Ability to view and edit individual workouts.
+  
+- **Workouts**:
+  - Record workouts with detailed information (exercise name, sets, weights, etc.).
+  - Ability to view, create, and use workout templates.
+  
+- **Exercise Catalog**:
+  - A catalog with over 2000 exercises where users can browse, add to favorites, and use exercises.
+  - Search and filter exercises by different parameters (type, target muscles, equipment, etc.).
 
-### `npm start`
+## Technologies
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The project is developed using the following technologies:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React**: Main framework for UI development.
+- **React Router**: For routing and navigation throughout the application.
+- **Bootstrap**: For responsive and stylish layouts.
+- **Favicons**: For icons used within the interface.
 
-### `npm test`
+## Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Backend Dependency
+- The Energo Fit frontend **requires** the [Energo Fit Backend](https://github.com/OctaneAL/fitness-app-backend) repository, which is written in **Rust** using the **Actix** framework. It handles all backend operations and must be running to provide the necessary API endpoints for the frontend.
 
-### `npm run build`
+### Database Setup
+- The backend is designed to work with a PostgreSQL database, which you will need to set up yourself. You can use a Docker container to create this database instance, as was done in this project setup.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Integration with Back End
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- The project uses a REST API with over 20 endpoints to provide functionality for workouts, user profile statistics, and exercise management.
+- Authentication is implemented using JWT tokens to protect user data and requests.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Challenges
 
-### `npm run eject`
+One of the main challenges was ensuring smooth interaction with a large dataset in the exercise catalog (2000+ items) and creating a user-friendly and efficient interface. Implementing complex functionality for Back End interaction through REST API with JWT authentication required special attention to security and optimization.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Screenshots
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Homepage**: Shows the general appearance of the application and the interface.
+- **User Profile**: Displays workout statistics (planned to improve the design further).
+- **Workout Template**: An example of a created workout template with added exercises.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Getting Started
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The project is already deployed and available for use at [Energo Fit - Live](http://ec2-51-20-193-148.eu-north-1.compute.amazonaws.com/).
 
-## Learn More
+However, if you'd like to run the project locally, you can use Docker:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- The Docker container is available under the name `octaneal/fitness-app-frontend`.
+  
+**Note**: The frontend requires the backend `octaneal/fitness-app-backend` container to be running, and the PostgreSQL database must be set up separately.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Local Installation
 
-### Code Splitting
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/energo-fit-frontend.git
+   cd energo-fit-frontend
+   
+## Running with Docker
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Pull and start the frontend container:
+   ```bash
+   docker pull octaneal/fitness-app-frontend
+   docker run -p 3000:3000 octaneal/fitness-app-frontend
