@@ -47,9 +47,14 @@ One of the main challenges was ensuring smooth interaction with a large dataset 
 
 ## Screenshots
 
-- **Homepage**: Shows the general appearance of the application and the interface.
-- **User Profile**: Displays workout statistics (planned to improve the design further).
-- **Workout Template**: An example of a created workout template with added exercises.
+### Homepage
+![Homepage](./screenshots/homepage.png)
+
+### User Profile
+![User Profile](./screenshots/profile.png)
+
+### Workout Template
+![Workout Template](./screenshots/workout-template.png)
 
 ## Getting Started
 
